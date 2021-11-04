@@ -87,10 +87,14 @@ public: // メンバ関数
 	const XMFLOAT3& GetPosition() { return position; }
 	// 座標の設定
 	void SetPosition(XMFLOAT3 position) { this->position = position; }
-	// 座標の取得
+	// X,Y,Z軸回りの取得
 	const XMFLOAT3& GetRotation() { return rotation; }
-	// 座標の設定
+	// X,Y,Z軸回りの設定
 	void SetRotation(XMFLOAT3 rotation) { this->rotation = rotation; }
+	// スケールの取得
+	const XMFLOAT3& GetRotation() { return scale; }
+	// スケールの設定
+	void SetRotation(XMFLOAT3 scale) { this->scale = scale; }
 	// モデルの設定
 	void SetModel(Model* model) { this->model = model; };
 
