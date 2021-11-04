@@ -26,14 +26,17 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	this->audio = audio;
 
 	// デバッグテキスト用テクスチャ読み込み
-	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
+	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
+	{
 		assert(0);
 	}
+
 	// デバッグテキスト初期化
 	debugText.Initialize(debugTextTexNumber);
 
 	// テクスチャ読み込み
-	if (!Sprite::LoadTexture(1, L"Resources/APEX_01.png")) {
+	if (!Sprite::LoadTexture(1, L"Resources/APEX_01.png"))
+	{
 		assert(0);
 	}
 
@@ -50,13 +53,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	// 3Dオブジェクトにモデルを割り当てる
 	object3d->SetModel(modelFighter);
 
-
+	/*
 	//.objの名前を指定してモデルを読み込む
 	modelFighter1 = modelFighter1->CreateFromObject("ground");
 	// 3Dオブジェクト生成
 	object3d1 = Object3d::Create();
 	// 3Dオブジェクトにモデルを割り当てる
 	object3d1->SetModel(modelFighter1);
+	*/
 
 	particleMan = ParticleManager::Create();
 
@@ -185,7 +189,7 @@ void GameScene::Draw()
 	Object3d::PreDraw(dxCommon->GetCommandList());
 	// 3Dオブクジェクトの描画
 	object3d->Draw();
-	object3d1->Draw();
+	//object3d1->Draw();
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
 #pragma endregion 3Dオブジェクト描画
