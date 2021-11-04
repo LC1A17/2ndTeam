@@ -46,9 +46,8 @@ private: // メンバ変数
 	// ゲームシーン用
 	Sprite* sprite = nullptr;
 	Model* modelFighter = nullptr;
-	Object3d* object3d = nullptr;
+	Object3d* baseObj = nullptr;
 	ParticleManager* particleMan = nullptr;
 
 	Model* modelFighter1 = nullptr;
-	Object3d* object3d1 = nullptr;
 };
