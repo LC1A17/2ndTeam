@@ -1,4 +1,5 @@
 ﻿//にしはた
+//たこやき
 #include "WinApp.h"
 #include "DirectXCommon.h"
 #include "Audio.h"
