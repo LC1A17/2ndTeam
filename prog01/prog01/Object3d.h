@@ -92,9 +92,9 @@ public: // メンバ関数
 	// X,Y,Z軸回りの設定
 	void SetRotation(XMFLOAT3 rotation) { this->rotation = rotation; }
 	// スケールの取得
-	const XMFLOAT3& GetRotation() { return scale; }
+	const XMFLOAT3& GetScale() { return scale; }
 	// スケールの設定
-	void SetRotation(XMFLOAT3 scale) { this->scale = scale; }
+	void SetScale(XMFLOAT3 scale) { this->scale = scale; }
 	// モデルの設定
 	void SetModel(Model* model) { this->model = model; };
 
