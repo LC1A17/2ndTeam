@@ -1,6 +1,4 @@
-﻿//にしはた
-//たこやき
-#include "WinApp.h"
+﻿#include "WinApp.h"
 #include "DirectXCommon.h"
 #include "Audio.h"
 #include "GameScene.h"

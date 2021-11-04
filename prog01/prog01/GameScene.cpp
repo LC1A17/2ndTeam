@@ -43,7 +43,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	sprite->SetPosition({ 100.0f,100.0f });
 
 	//.objの名前を指定してモデルを読み込む
-	modelFighter = modelFighter->CreateFromObject("cube");
+	//modelFighter = modelFighter->CreateFromObject("cube");
+	modelFighter = modelFighter->CreateFromObject("base");
 	// 3Dオブジェクト生成
 	object3d = Object3d::Create();
 	// 3Dオブジェクトにモデルを割り当てる
