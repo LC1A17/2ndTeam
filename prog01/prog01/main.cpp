@@ -89,6 +89,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dxCommon->PostDraw();
 
 #pragma endregion グラフィックスコマンド
+
+		//ESCを押すと強制終了
+		if (input->PushKey(DIK_ESCAPE))
+		{
+			break;
+		}
 	}
 
 	//解放

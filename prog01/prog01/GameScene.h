@@ -25,6 +25,13 @@ private: // エイリアス
 private: // 静的メンバ変数
 	static const int debugTextTexNumber = 0;
 
+public:
+	//SceneNum用
+	enum Scene
+	{
+		Title, Game, End
+	};
+
 public: // メンバ関数
 	// コンストクラタ
 	GameScene();
@@ -46,9 +53,28 @@ private: // メンバ変数
 	// ゲームシーン用
 	Sprite* sprite = nullptr;
 	Model* modelFighter = nullptr;
-	Object3d* object3d = nullptr;
+	
+	Object3d* baseObj = nullptr;//フィールド
+	Object3d* playerObj = nullptr;//プレイヤー
+	Object3d* enemyObj = nullptr;//エネミー
+	Object3d* bulletObj[255] = { nullptr };//弾
+
 	ParticleManager* particleMan = nullptr;
 
 	Model* modelFighter1 = nullptr;
-	Object3d* object3d1 = nullptr;
+
+	int sceneNum = Game;//Title, Game, Endで管理
+	int circle = 2;//プレイヤーのいる円周の位置。1が最低値で数が大きい方が外側
+	int maxCircle = 3;//現在の円周の最大数
+
+	int playerHP = 100;//プレイヤーの体力
+	XMFLOAT3 pPos = { 100, 1, 0 };//プレイヤーの座標
+	XMFLOAT3 pScale = { 10, 10, 10 };//プレイヤーの大きさ
+	XMFLOAT3 pBullPos[255];//プレイヤーの弾の座標
+	XMFLOAT3 pBullScale[255];//プレイヤーの弾の大きさ
+	bool pBull[255] = { false };//プレイヤーの弾が画面上に出ているかどうか
+
+	int enemyHP = 100;//敵の体力
+	XMFLOAT3 ePos = { 0, 0, 0 };//敵の座標
+	XMFLOAT3 eScale = { 5, 5, 5 };//敵の大きさ
 };

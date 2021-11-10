@@ -9,7 +9,7 @@ GameScene::GameScene()
 GameScene::~GameScene()
 {
 	safe_delete(sprite);
-	safe_delete(object3d);
+	safe_delete(baseObj);
 	safe_delete(modelFighter);
 	safe_delete(particleMan);
 }
@@ -26,17 +26,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	this->audio = audio;
 
 	// デバッグテキスト用テクスチャ読み込み
-	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
-	{
+	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png")) {
 		assert(0);
 	}
-
 	// デバッグテキスト初期化
 	debugText.Initialize(debugTextTexNumber);
 
 	// テクスチャ読み込み
-	if (!Sprite::LoadTexture(1, L"Resources/APEX_01.png"))
-	{
+	if (!Sprite::LoadTexture(1, L"Resources/APEX_01.png")) {
 		assert(0);
 	}
 
@@ -49,18 +46,41 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	//modelFighter = modelFighter->CreateFromObject("cube");
 	modelFighter = modelFighter->CreateFromObject("base");
 	// 3Dオブジェクト生成
-	object3d = Object3d::Create();
+	baseObj = Object3d::Create();
 	// 3Dオブジェクトにモデルを割り当てる
-	object3d->SetModel(modelFighter);
+	baseObj->SetModel(modelFighter);
+	baseObj->SetScale({ 100,100,100 });
 
-	/*
-	//.objの名前を指定してモデルを読み込む
-	modelFighter1 = modelFighter1->CreateFromObject("ground");
+	modelFighter = modelFighter->CreateFromObject("player");
+	//3Dオブジェクト生成
+	playerObj = Object3d::Create();
+	
+	//3Dオブジェクトにモデルを割り当てる
+	playerObj->SetModel(modelFighter);
+	playerObj->SetPosition({ pPos });
+	playerObj->SetScale({ pScale });
+
+	modelFighter = modelFighter->CreateFromObject("enemy");
 	// 3Dオブジェクト生成
-	object3d1 = Object3d::Create();
+	enemyObj = Object3d::Create();
 	// 3Dオブジェクトにモデルを割り当てる
-	object3d1->SetModel(modelFighter1);
-	*/
+	enemyObj->SetModel(modelFighter);
+	enemyObj->SetPosition({ ePos });
+	enemyObj->SetScale({ eScale });
+
+	for (int i = 0; i < 255; i++)
+	{
+		pBullPos[i] = { 1000, 1000, 1000 };
+		pBullScale[i] = { 10, 10, 10 };
+
+		modelFighter = modelFighter->CreateFromObject("bullet");
+		// 3Dオブジェクト生成
+		bulletObj[i] = Object3d::Create();
+		// 3Dオブジェクトにモデルを割り当てる
+		bulletObj[i]->SetModel(modelFighter);
+		bulletObj[i]->SetPosition({ pBullPos[i] });
+		bulletObj[i]->SetScale({ pBullScale[i] });
+	}
 
 	particleMan = ParticleManager::Create();
 
@@ -70,6 +90,88 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 void GameScene::Update()
 {
+	//1:タイトル画面
+	if (sceneNum == Title)
+	{
+		//スペースを押すと開始
+		if (input->TriggerKey(DIK_SPACE))
+		{
+			sceneNum = Game;
+		}
+	}
+
+	//2:ゲーム画面
+	else if (sceneNum == Game)
+	{
+		//入力処理
+		//軸を移動
+		if (input->PushKey(DIK_UP))
+		{
+			//内側へ移動
+			//一番内側にいないなら移動
+			if (circle > 1)
+			{
+				circle--;
+			}
+		}
+
+		else if (input->PushKey(DIK_DOWN))
+		{
+			//外側へ移動
+			//一番外側にいないなら移動
+			if (circle < maxCircle)
+			{
+				circle++;
+			}
+
+		}
+
+		//円周上を移動
+		if (input->PushKey(DIK_LEFT))
+		{
+			//反時計回りに移動
+
+		}
+
+		else if (input->PushKey(DIK_RIGHT))
+		{
+			//時計回りに移動
+
+		}
+
+		//弾を発射
+		if (input->PushKey(DIK_SPACE))
+		{
+			//画面上に存在しない弾を一つ選んで自機の位置にセット
+			for (int i = 0; i < 255; i++)
+			{
+				if (pBull[i] == false)
+				{
+					bulletObj[i]->SetPosition({ pPos });
+ 					pBull[i] = true;
+					break;
+				}
+			}
+		}
+
+		//更新処理
+		//プレイヤーの体力が0になったら終了
+		if (playerHP >= 0)
+		{
+			sceneNum = End;
+		}
+	}
+
+	//3:リザルト画面
+	else if (sceneNum == End)
+	{
+		//スペースを押すとタイトルに戻る
+		if (input->TriggerKey(DIK_SPACE))
+		{
+			sceneNum = Title;
+		}
+	}
+
 	//キーが押されているときの処理
 	if (input->TriggerKey(DIK_0))
 	{
@@ -77,15 +179,15 @@ void GameScene::Update()
 	}
 
 	//X座標、Y座標を指定して表示
-	debugText.Print("Hello,DirectX!!", 200, 100, 1.0f);
+	//debugText.Print("Hello,DirectX!!", 200, 100, 1.0f);
 	//X座標、Y座標、縮尺を指定して表示
-	debugText.Print("Nihon Kogakuin", 200, 200, 2.0f);
+	//debugText.Print("Nihon Kogakuin", 200, 200, 2.0f);
 
 	// オブジェクト移動
 	if (input->PushKey(DIK_UP) || input->PushKey(DIK_DOWN) || input->PushKey(DIK_RIGHT) || input->PushKey(DIK_LEFT))
 	{
 		// 現在の座標を取得
-		XMFLOAT3 rotation = object3d->GetRotation();
+		XMFLOAT3 rotation = baseObj->GetRotation();
 
 		// 移動後の座標を計算
 		if (input->PushKey(DIK_UP))
@@ -107,7 +209,7 @@ void GameScene::Update()
 		}
 
 		// 座標の変更を反映
-		object3d->SetRotation(rotation);
+		baseObj->SetRotation(rotation);
 	}
 
 	// カメラ移動
@@ -132,7 +234,15 @@ void GameScene::Update()
 		}
 	}
 
-	object3d->SetEye({ 0,85,-100 });
+	baseObj->SetEye({ 0,180,1 });
+
+	playerObj->SetEye({ 0,180,1 });
+	enemyObj->SetEye({ 0,180,1 });
+
+	for (int i = 0; i < 255; i++)
+	{
+		bulletObj[i]->SetEye({ 0,180,1 });
+	}
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -163,10 +273,15 @@ void GameScene::Update()
 		particleMan->Add(60, pos, vel, acc, 1.0f, 0.0f, color);
 	}
 
-	object3d1->SetPosition({ 0,-10.0f,0 });
+	baseObj->Update();
+	playerObj->Update();
+	enemyObj->Update();
 
-	object3d->Update();
-	object3d1->Update();
+	for (int i = 0; i < 255; i++)
+	{
+		bulletObj[i]->Update();
+	}
+
 	particleMan->Update();
 }
 
@@ -174,30 +289,45 @@ void GameScene::Draw()
 {
 	// コマンドリストの取得
 	ID3D12GraphicsCommandList* cmdList = dxCommon->GetCommandList();
+
 #pragma region 背景スプライト描画
 	// 背景スプライト描画前処理
 	Sprite::PreDraw(dxCommon->GetCommandList());
 	// 背景スプライト描画
-	sprite->Draw();
+	//sprite->Draw();
 	// スプライト描画後処理
 	Sprite::PostDraw();
 	// 深度バッファクリア
 	dxCommon->ClearDepthBuffer();
 #pragma endregion 背景スプライト描画
+
 #pragma region 3Dオブジェクト描画
 	// 3Dオブジェクト描画前処理
 	Object3d::PreDraw(dxCommon->GetCommandList());
-	// 3Dオブクジェクトの描画
-	object3d->Draw();
+	// 3Dオブジェクトの描画
+	baseObj->Draw();
+	playerObj->Draw();
+	enemyObj->Draw();
+
+	for (int i = 0; i < 255; i++)
+	{
+		if (pBull[i] == true)
+		{
+			bulletObj[i]->Draw();
+		}
+	}
+
 	//object3d1->Draw();
 	// 3Dオブジェクト描画後処理
 	Object3d::PostDraw();
 #pragma endregion 3Dオブジェクト描画
+
 #pragma region パーティクル
 	ParticleManager::PreDraw(dxCommon->GetCommandList());
 	//particleMan->Draw();
 	ParticleManager::PostDraw();
 #pragma endregion パーティクル
+
 #pragma region 前景スプライト描画
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(dxCommon->GetCommandList());
