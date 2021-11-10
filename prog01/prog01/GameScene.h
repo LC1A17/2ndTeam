@@ -21,6 +21,7 @@ private: // エイリアス
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
+	using XMVECTOR = DirectX::XMVECTOR;
 
 private: // 静的メンバ変数
 	static const int debugTextTexNumber = 0;
@@ -66,7 +67,8 @@ private: // メンバ変数
 	XMFLOAT3 baseScale = { 100,100,100 };//土台のスケール
 
 	int playerHP = 100;//プレイヤーの体力
-	XMFLOAT3 pPos = { 100, 1, 0 };//プレイヤーの座標
+	XMFLOAT3 pPos = { 0, 0, 95 };//プレイヤーの座標
+	XMFLOAT3 pRot = { 0, 0, 0 };//プレイヤーの傾き
 	XMFLOAT3 pScale = { 10, 10, 10 };//プレイヤーの大きさ
 	XMFLOAT3 pOldPos[255];//プレイヤーの座標
 	XMFLOAT3 pBullPos[255];//プレイヤーの弾の座標
@@ -78,4 +80,14 @@ private: // メンバ変数
 	int eDamageInterval = 50;//敵の被弾時の無敵時間
 	XMFLOAT3 ePos = { 0, 0, 0 };//敵の座標
 	XMFLOAT3 eScale = { 5, 5, 5 };//敵の大きさ
+
+	float posX = 0.0f;
+	float posZ = 0.0f;
+	float rad = 0.0f;
+	float angle = 90.0f;
+	float len = 60.0f;
+	float aroundX = 0.0f;
+	float aroundZ = 0.0f;
+
+	XMVECTOR hoge;
 };
