@@ -97,6 +97,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 //更新処理
 void GameScene::Update()
 {
+	hoge.m128_f32[0] = circle;
+	std::ostringstream spherestr;
+	spherestr << "Sphere:("
+		<< std::fixed << std::setprecision(2)
+		<< hoge.m128_f32[0] << ")";
+
 	//1:タイトル画面
 	if (sceneNum == Title)
 	{
@@ -112,9 +118,19 @@ void GameScene::Update()
 	//2:ゲーム画面
 	else if (sceneNum == Game)
 	{
+		rad = angle * 3.14f / 180.0f;
+
+		aroundX = cos(rad) * len;
+		aroundZ = sin(rad) * len;
+
+		pPos.x = posX + aroundX;
+		pPos.z = posZ + aroundZ;
+
+		playerObj->SetPosition({ pPos });
+
 		//入力処理
-		//他の円に移動
-		if (input->PushKey(DIK_UP))
+		//軸を移動
+		if (input->TriggerKey(DIK_UP))
 		{
 			//内側へ移動
 			//一番内側にいないなら移動
@@ -124,7 +140,7 @@ void GameScene::Update()
 			}
 		}
 
-		else if (input->PushKey(DIK_DOWN))
+		else if (input->TriggerKey(DIK_DOWN))
 		{
 			//外側へ移動
 			//一番外側にいないなら移動
@@ -132,20 +148,34 @@ void GameScene::Update()
 			{
 				circle++;
 			}
+		}
 
+		if (circle == 1)
+		{
+			len = 30.0f;
+		}
+
+		if (circle == 2)
+		{
+			len = 60.0f;
+		}
+
+		if (circle == 3)
+		{
+			len = 90.0f;
 		}
 
 		//円周上を移動
 		if (input->PushKey(DIK_LEFT))
 		{
-			//時計回りに移動
-
+			//反時計回りに移動
+			angle -= 2.0f;
 		}
 
-		else if (input->PushKey(DIK_RIGHT))
+		if (input->PushKey(DIK_RIGHT))
 		{
-			//反時計回りに移動
-
+			//時計回りに移動
+			angle += 2.0f;
 		}
 
 		//弾を発射
@@ -183,7 +213,7 @@ void GameScene::Update()
 				bulletObj[i]->SetPosition({ pBullPos[i] });
 			}
 
-			//壁との判定
+			/*//壁との判定
 			if ( 1 )
 			{
 				pBullPos[i] = { 1000, 1000, 1000 };
@@ -199,7 +229,7 @@ void GameScene::Update()
 				bulletObj[i]->SetPosition({ pBullPos[i] });
 				pBull[i] = false;
 				eDamageInterval = 0;
-			}
+			}*/
 
 			//画面外に出た弾をfalseにする
 			if (pBullPos[i].x <= -200 || pBullPos[i].x >= 200 || pBullPos[i].z <= -200 || pBullPos[i].z >= 200)
@@ -231,6 +261,7 @@ void GameScene::Update()
 		debugText.Print("End", 0, 0, 1.0f);
 	}
 
+	debugText.Print(spherestr.str(), 50, 180, 1.0f);
 	baseObj->SetEye({ 0,180,1 });
 	playerObj->SetEye({ 0,180,1 });
 	enemyObj->SetEye({ 0,180,1 });
