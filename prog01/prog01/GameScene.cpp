@@ -153,29 +153,32 @@ void GameScene::Update()
 		if (circle == 1)
 		{
 			len = 30.0f;
+			speed = 2.5f;
 		}
 
 		if (circle == 2)
 		{
 			len = 60.0f;
+			speed = 2.0f;
 		}
 
 		if (circle == 3)
 		{
 			len = 90.0f;
+			speed = 1.5f;
 		}
 
 		//â~é¸è„Çà⁄ìÆ
 		if (input->PushKey(DIK_LEFT))
 		{
 			//îΩéûåvâÒÇËÇ…à⁄ìÆ
-			angle -= 2.0f;
+			angle -= speed;
 		}
 
 		if (input->PushKey(DIK_RIGHT))
 		{
 			//éûåvâÒÇËÇ…à⁄ìÆ
-			angle += 2.0f;
+			angle += speed;
 		}
 
 		//íeÇî≠éÀ
@@ -191,6 +194,11 @@ void GameScene::Update()
 						pOldPos[i] = pPos;
 						pBullPos[i] = pPos;
 						bulletObj[i]->SetPosition({ pBullPos[i] });
+						pBullX[i] = ePos.x - pOldPos[i].x;
+						pBullY[i] = ePos.z - pOldPos[i].z;
+						pBullXY[i] = sqrt(pBullX[i] * pBullX[i] + pBullY[i] * pBullY[i]);
+						pBullSpeedX[i] = pBullX[i] / pBullXY[i] * 2;
+						pBullSpeedY[i] = pBullY[i] / pBullXY[i] * 2;
 						pBull[i] = true;
 						pBullInterval = 0;
 						break;
@@ -209,7 +217,8 @@ void GameScene::Update()
 			//íeÇÃãììÆ
 			if (pBull[i] == true)
 			{
-				pBullPos[i].x += 2;
+				pBullPos[i].x += pBullSpeedX[i];
+				pBullPos[i].z += pBullSpeedY[i];
 				bulletObj[i]->SetPosition({ pBullPos[i] });
 			}
 
@@ -220,16 +229,24 @@ void GameScene::Update()
 				bulletObj[i]->SetPosition({ pBullPos[i] });
 				pBull[i] = false;
 			}
+			*/
 
 			//ìGÇ∆ÇÃîªíË
 			if (eDamageInterval >= 50)
 			{
-				enemyHP--;
-				pBullPos[i] = { 1000, 1000, 1000 };
-				bulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
-				eDamageInterval = 0;
-			}*/
+				float a = pBullPos[i].x - ePos.x;
+				float b = pBullPos[i].z - ePos.z;
+				float c = sqrt(a * a + b * b);
+
+				if (c <= 10)
+				{
+					enemyHP--;
+					pBullPos[i] = { 1000, 1000, 1000 };
+					bulletObj[i]->SetPosition({ pBullPos[i] });
+					pBull[i] = false;
+					eDamageInterval = 0;
+				}
+			}
 
 			//âÊñ äOÇ…èoÇΩíeÇfalseÇ…Ç∑ÇÈ
 			if (pBullPos[i].x <= -200 || pBullPos[i].x >= 200 || pBullPos[i].z <= -200 || pBullPos[i].z >= 200)

@@ -75,6 +75,9 @@ private: // メンバ変数
 	XMFLOAT3 pBullScale[255];//プレイヤーの弾の大きさ
 	int pBullInterval = 30;
 	bool pBull[255] = { false };//プレイヤーの弾が画面上に出ているかどうか
+	float pBullSpeedX[255], pBullSpeedY[255];//プレイヤーの弾の挙動用
+	float pBullX[255], pBullY[255], pBullXY[255];//プレイヤーの弾の挙動用
+	float speed = 2.0f;
 
 	int enemyHP = 100;//敵の体力
 	int eDamageInterval = 50;//敵の被弾時の無敵時間
