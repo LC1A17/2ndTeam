@@ -88,31 +88,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		bulletObj[i]->SetScale({ pBullScale[i] });
 	}
 
-	//弾と壁
-	for (int i = 0; i < 255; i++)
-	{
-		pOldPos[i] = { 1000, 1000, 1000 };
-		pBullPos[i] = { 1000, 1000, 1000 };
-		pBullScale[i] = { 10, 10, 10 };
-		wallPos[i] = { 1000, 1000, 1000 };
-		wallScale[i] = { 2, 2, 2 };
-
-		modelFighter = modelFighter->CreateFromObject("bullet");
-		bulletObj[i] = Object3d::Create();
-		bulletObj[i]->SetModel(modelFighter);
-		bulletObj[i]->SetPosition({ pBullPos[i] });
-		bulletObj[i]->SetScale({ pBullScale[i] });
-
-		modelFighter = modelFighter->CreateFromObject("wall");
-		wallObj[i] = Object3d::Create();
-		wallObj[i]->SetModel(modelFighter);
-		wallObj[i]->SetPosition({ wallPos[i] });
-		wallObj[i]->SetScale({ wallScale[i] });
-	}
-
-	wallObj[0]->SetPosition({ 100, 20, 0 });
-	isWall[0] = true;
-
 	particleMan = ParticleManager::Create();
 
 	//サウンド再生
@@ -144,12 +119,6 @@ void GameScene::Update()
 	else if (sceneNum == Game)
 	{
 		rad = angle * 3.14f / 180.0f;
-
-		aroundX = cos(rad) * len;
-		aroundZ = sin(rad) * len;
-
-		pPos.x = posX + aroundX;
-		pPos.z = posZ + aroundZ;
 
 		aroundX = cos(rad) * len;
 		aroundZ = sin(rad) * len;
@@ -328,156 +297,6 @@ void GameScene::Update()
 		bulletObj[i]->Update();
 	}
 
-		{
-			len = 30.0f;
-			speed = 2.5f;
-		}
-
-		if (circle == 2)
-		{
-			len = 60.0f;
-			speed = 2.0f;
-		}
-
-		if (circle == 3)
-		{
-			len = 90.0f;
-			speed = 1.5f;
-		}
-
-		//円周上を移動
-		if (input->PushKey(DIK_LEFT))
-		{
-			//反時計回りに移動
-			angle -= speed;
-		}
-
-		if (input->PushKey(DIK_RIGHT))
-		{
-			//時計回りに移動
-			angle += speed;
-		}
-
-		//弾を発射
-		if (input->PushKey(DIK_SPACE))
-		{
-			if (pBullInterval >= 30)
-			{
-				//画面上に存在しない弾を一つ選んで自機の位置にセット
-				for (int i = 0; i < 255; i++)
-				{
-					if (pBull[i] == false)
-					{
-						pOldPos[i] = pPos;
-						pBullPos[i] = pPos;
-						bulletObj[i]->SetPosition({ pBullPos[i] });
-						pBullX[i] = ePos.x - pOldPos[i].x;
-						pBullY[i] = ePos.z - pOldPos[i].z;
-						pBullXY[i] = sqrt(pBullX[i] * pBullX[i] + pBullY[i] * pBullY[i]);
-						pBullSpeedX[i] = pBullX[i] / pBullXY[i] * 2;
-						pBullSpeedY[i] = pBullY[i] / pBullXY[i] * 2;
-						pBull[i] = true;
-						pBullInterval = 0;
-						break;
-					}
-				}
-			}
-		}
-
-		//更新処理
-		pBullInterval++;
-		eDamageInterval++;
-
-		//プレイヤーの弾
-		for (int i = 0; i < 255; i++)
-		{
-			//弾の挙動
-			if (pBull[i] == true)
-			{
-				pBullPos[i].x += pBullSpeedX[i];
-				pBullPos[i].z += pBullSpeedY[i];
-				bulletObj[i]->SetPosition({ pBullPos[i] });
-			}
-
-			//壁との判定
-			for (int j = 0; j < 255; j++)
-			{
-				if (isWall[j] == true)
-				{
-					//pBullPos[i] = { 1000, 1000, 1000 };
-					//bulletObj[i]->SetPosition({ pBullPos[i] });
-					//pBull[i] = false;
-				}
-			}
-
-			//敵との判定
-			if (eDamageInterval >= 50)
-			{
-				float a = pBullPos[i].x - ePos.x;
-				float b = pBullPos[i].z - ePos.z;
-				float c = sqrt(a * a + b * b);
-
-				if (c <= 10)
-				{
-					enemyHP--;
-					pBullPos[i] = { 1000, 1000, 1000 };
-					bulletObj[i]->SetPosition({ pBullPos[i] });
-					pBull[i] = false;
-					eDamageInterval = 0;
-				}
-			}
-
-			//画面外に出た弾をfalseにする
-			if (pBullPos[i].x <= -200 || pBullPos[i].x >= 200 || pBullPos[i].z <= -200 || pBullPos[i].z >= 200)
-			{
-				pBullPos[i] = { 1000, 1000, 1000 };
-				bulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
-			}
-		}
-
-		//プレイヤーの体力が0になったら終了
-		if (playerHP <= 0)
-		{
-			sceneNum = End;
-		}
-
-		debugText.Print("Game", 0, 0, 1.0f);
-	}
-
-	//3:リザルト画面
-	else if (sceneNum == End)
-	{
-		//スペースを押すとタイトルに戻る
-		if (input->TriggerKey(DIK_SPACE))
-		{
-			sceneNum = Title;
-		}
-
-		debugText.Print("End", 0, 0, 1.0f);
-	}
-
-	debugText.Print(spherestr.str(), 50, 180, 1.0f);
-	baseObj->SetEye({ 0,180,1 });
-	playerObj->SetEye({ 0,180,1 });
-	enemyObj->SetEye({ 0,180,1 });
-
-	for (int i = 0; i < 255; i++)
-	{
-		bulletObj[i]->SetEye({ 0,180,1 });
-		wallObj[i]->SetEye({ 0,180,1 });
-	}
-
-	baseObj->Update();
-	playerObj->Update();
-	enemyObj->Update();
-
-	for (int i = 0; i < 255; i++)
-	{
-		bulletObj[i]->Update();
-		wallObj[i]->Update();
-	}
-
 	/*
 	for (int i = 0; i < 10; i++)
 	{
@@ -547,11 +366,6 @@ void GameScene::Draw()
 			if (pBull[i] == true)
 			{
 				bulletObj[i]->Draw();
-			}
-
-			if (isWall[i] == true)
-			{
-				wallObj[i]->Draw();
 			}
 		}
 	}
