@@ -391,6 +391,12 @@ void Model::LoadMaterial(const std::string& directoryPath, const std::string& fi
 	}
 	//ファイルを閉じる
 	file.close();
+
+	if (material)
+	{
+		// マテリアルを登録
+		AddMaterial(material);
+	}
 }
 
 void Model::AddMaterial(Material* material)
