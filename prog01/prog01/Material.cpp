@@ -53,7 +53,7 @@ void Material::LoadTexture(const std::string& directoryPath, CD3DX12_CPU_DESCRIP
 	// テクスチャなし
 =======
 	//テクスチャなし
->>>>>>> c30fabe374d76e885ffeefa8ab3c6d8564213a30
+>>>>>>> e29bad67696d15a8f797935b7f879313ababe24d
 	if (textureFilename.size() == 0)
 	{
 		textureFilename = "APEX_01.png";

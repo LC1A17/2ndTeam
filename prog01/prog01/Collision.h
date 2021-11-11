@@ -23,5 +23,5 @@ public:
 	
 	//球と法線付き三角形の当たり判定
 	static bool CheckSphere2Triangle(const Sphere& sphere, const Triangle& triangle, DirectX::XMVECTOR* inter = nullptr);
->>>>>>> c30fabe374d76e885ffeefa8ab3c6d8564213a30
+>>>>>>> e29bad67696d15a8f797935b7f879313ababe24d
 };
