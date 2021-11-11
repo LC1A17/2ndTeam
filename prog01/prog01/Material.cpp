@@ -49,7 +49,11 @@ void Material::CreateConstantBuffer()
 
 void Material::LoadTexture(const std::string& directoryPath, CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle)
 {
+<<<<<<< HEAD
 	// テクスチャなし
+=======
+	//テクスチャなし
+>>>>>>> c30fabe374d76e885ffeefa8ab3c6d8564213a30
 	if (textureFilename.size() == 0)
 	{
 		textureFilename = "APEX_01.png";
