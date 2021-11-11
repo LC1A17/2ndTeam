@@ -74,19 +74,30 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyObj->SetPosition({ ePos });
 	enemyObj->SetScale({ eScale });
 
-	//’e
+	//’e‚Æ•Ç
 	for (int i = 0; i < 255; i++)
 	{
 		pOldPos[i] = { 1000, 1000, 1000 };
 		pBullPos[i] = { 1000, 1000, 1000 };
 		pBullScale[i] = { 10, 10, 10 };
+		wallPos[i] = { 1000, 1000, 1000 };
+		wallScale[i] = { 2, 2, 2 };
 
 		modelFighter = modelFighter->CreateFromObject("bullet");
 		bulletObj[i] = Object3d::Create();
 		bulletObj[i]->SetModel(modelFighter);
 		bulletObj[i]->SetPosition({ pBullPos[i] });
 		bulletObj[i]->SetScale({ pBullScale[i] });
+
+		modelFighter = modelFighter->CreateFromObject("wall");
+		wallObj[i] = Object3d::Create();
+		wallObj[i]->SetModel(modelFighter);
+		wallObj[i]->SetPosition({ wallPos[i] });
+		wallObj[i]->SetScale({ wallScale[i] });
 	}
+
+	wallObj[0]->SetPosition({ 100, 20, 0 });
+	isWall[0] = true;
 
 	particleMan = ParticleManager::Create();
 
@@ -222,14 +233,16 @@ void GameScene::Update()
 				bulletObj[i]->SetPosition({ pBullPos[i] });
 			}
 
-			/*//•Ç‚Æ‚Ì”»’è
-			if ( 1 )
+			//•Ç‚Æ‚Ì”»’è
+			for (int j = 0; j < 255; j++)
 			{
-				pBullPos[i] = { 1000, 1000, 1000 };
-				bulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
+				if (isWall[j] == true)
+				{
+					//pBullPos[i] = { 1000, 1000, 1000 };
+					//bulletObj[i]->SetPosition({ pBullPos[i] });
+					//pBull[i] = false;
+				}
 			}
-			*/
 
 			//“G‚Æ‚Ì”»’è
 			if (eDamageInterval >= 50)
@@ -286,6 +299,7 @@ void GameScene::Update()
 	for (int i = 0; i < 255; i++)
 	{
 		bulletObj[i]->SetEye({ 0,180,1 });
+		wallObj[i]->SetEye({ 0,180,1 });
 	}
 
 	baseObj->Update();
@@ -295,6 +309,7 @@ void GameScene::Update()
 	for (int i = 0; i < 255; i++)
 	{
 		bulletObj[i]->Update();
+		wallObj[i]->Update();
 	}
 
 	/*
@@ -366,6 +381,11 @@ void GameScene::Draw()
 			if (pBull[i] == true)
 			{
 				bulletObj[i]->Draw();
+			}
+
+			if (isWall[i] == true)
+			{
+				wallObj[i]->Draw();
 			}
 		}
 	}
