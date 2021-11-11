@@ -2,7 +2,7 @@
 
 using namespace DirectX;
 
-XMFLOAT3 Camera::eye = { 0, 0, -50.0f };
+XMFLOAT3 Camera::eye = { 0, 80, 140.0f };
 XMFLOAT3 Camera::target = { 0, 0, 0 };
 XMFLOAT3 Camera::up = { 0, 1, 0 };
 
