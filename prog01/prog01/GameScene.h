@@ -48,12 +48,16 @@ private: // メンバ変数
 
 	// ゲームシーン用
 	Sprite* sprite = nullptr;
+	Sprite* titleBack = nullptr;//タイトル
+	Sprite* gameBack = nullptr;//ゲーム
+	Sprite* endBack = nullptr;//エンド
 	Model* modelFighter = nullptr;
 	
 	Object3d* baseObj = nullptr;//フィールド
 	Object3d* playerObj = nullptr;//プレイヤー
 	Object3d* enemyObj = nullptr;//エネミー
 	Object3d* bulletObj[255] = { nullptr };//弾
+	Object3d* wallObj[255] = { nullptr };//弾
 
 	ParticleManager* particleMan = nullptr;
 
@@ -65,6 +69,9 @@ private: // メンバ変数
 
 	XMFLOAT3 basePos = { 0,0,5 };//土台の座標
 	XMFLOAT3 baseScale = { 100,100,100 };//土台のスケール
+	XMFLOAT3 wallPos[255];//壁の座標
+	XMFLOAT3 wallScale[255];//壁のスケール
+	bool isWall[255] = { false };//壁が出ているか
 
 	int playerHP = 100;//プレイヤーの体力
 	XMFLOAT3 pPos = { 0, 0, 95 };//プレイヤーの座標

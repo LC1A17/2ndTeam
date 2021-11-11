@@ -47,10 +47,37 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		assert(0);
 	}
 
+	if (!Sprite::LoadTexture(2, L"Resources/title.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(3, L"Resources/game.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(4, L"Resources/end.png"))
+	{
+		assert(0);
+	}
+
 	//”wŒiƒXƒvƒ‰ƒCƒg¶¬
 	sprite = Sprite::Create(1, { 0.0f,0.0f });
 	sprite->SetSize({ 100.0f,100.0f });
 	sprite->SetPosition({ 100.0f,100.0f });
+
+	titleBack = Sprite::Create(2, { 0.0f,0.0f });
+	titleBack->SetSize({ WinApp::window_width, WinApp::window_height });
+	titleBack->SetPosition({ 0.0f,0.0f });
+
+	gameBack = Sprite::Create(3, { 0.0f,0.0f });
+	gameBack->SetSize({ WinApp::window_width, WinApp::window_height });
+	gameBack->SetPosition({ 0.0f,0.0f });
+
+	endBack = Sprite::Create(4, { 0.0f,0.0f });
+	endBack->SetSize({ WinApp::window_width, WinApp::window_height });
+	endBack->SetPosition({ 0.0f,0.0f });
 
 	//3DƒIƒuƒWƒFƒNƒg¶¬
 
@@ -86,6 +113,12 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		bulletObj[i]->SetModel(modelFighter);
 		bulletObj[i]->SetPosition({ pBullPos[i] });
 		bulletObj[i]->SetScale({ pBullScale[i] });
+
+		modelFighter = modelFighter->CreateFromObject("wall");
+		wallObj[i] = Object3d::Create();
+		wallObj[i]->SetModel(modelFighter);
+		wallObj[i]->SetPosition({ wallPos[i] });
+		wallObj[i]->SetScale({ wallScale[i] });
 	}
 
 	particleMan = ParticleManager::Create();
@@ -286,6 +319,7 @@ void GameScene::Update()
 	for (int i = 0; i < 255; i++)
 	{
 		bulletObj[i]->SetEye({ 0,180,1 });
+		wallObj[i]->SetEye({ 0,180,1 });
 	}
 
 	baseObj->Update();
@@ -295,6 +329,7 @@ void GameScene::Update()
 	for (int i = 0; i < 255; i++)
 	{
 		bulletObj[i]->Update();
+		wallObj[i]->Update();
 	}
 
 	/*
@@ -339,7 +374,22 @@ void GameScene::Draw()
 #pragma region ”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
 
 	Sprite::PreDraw(dxCommon->GetCommandList());//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ‘Oˆ—
-	//sprite->Draw();//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+	
+	if (sceneNum == Title)
+	{
+		titleBack->Draw();//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+	}
+
+	else if (sceneNum == Game)
+	{
+		gameBack->Draw();//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+	}
+	
+	else if (sceneNum == End)
+	{
+		endBack->Draw();//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+	}
+
 	Sprite::PostDraw();//ƒXƒvƒ‰ƒCƒg•`‰æŒãˆ—
 	dxCommon->ClearDepthBuffer();//[“xƒoƒbƒtƒ@ƒNƒŠƒA
 
@@ -366,6 +416,11 @@ void GameScene::Draw()
 			if (pBull[i] == true)
 			{
 				bulletObj[i]->Draw();
+			}
+
+			if (isWall[i] == true)
+			{
+				wallObj[i]->Draw();
 			}
 		}
 	}

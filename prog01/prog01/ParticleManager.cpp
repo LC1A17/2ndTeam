@@ -639,9 +639,12 @@ void ParticleManager::Update()
 		it->scale = (it->e_scale - it->s_scale) / f;
 		it->scale += it->s_scale;
 		//色
-		it->color.x = it->color.x;
-		it->color.y = it->color.y;
-		it->color.z = it->color.z;
+		it->color.x = (it->e_color.x - it->s_color.x) / f;
+		it->color.x += it->s_color.x;
+		it->color.y = (it->e_color.y - it->s_color.y) / f;
+		it->color.y += it->s_color.y;
+		it->color.z = (it->e_color.z - it->s_color.z) / f;
+		it->color.z += it->s_color.z;
 	}
 
 	//頂点バッファへデータ転送
@@ -696,7 +699,7 @@ void ParticleManager::Draw()
 }
 
 void ParticleManager::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
-	float start_scale, float end_scale, XMFLOAT4 color)
+	float start_scale, float end_scale, XMFLOAT4 start_color, XMFLOAT4 end_color)
 {
 	//リストに要素を追加
 	particles.emplace_front();
@@ -709,7 +712,8 @@ void ParticleManager::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOA
 	p.num_frame = life;
 	p.s_scale = start_scale;
 	p.e_scale = end_scale;
-	p.color = color;
+	p.s_color = start_color;
+	p.e_color = end_color;
 }
 
 const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
