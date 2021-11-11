@@ -58,7 +58,11 @@ public: // サブクラス
 		// 最終値
 		float e_scale = 0.0f;
 		// 色(RGBA)
-		XMFLOAT4 color = {};
+		XMFLOAT4 color = { 1, 1, 1, 1 };
+		// 色(RGBA)初期値
+		XMFLOAT4 s_color = {};
+		// 色(RGBA)最終値
+		XMFLOAT4 e_color = {};
 	};
 
 private: // 定数
@@ -152,7 +156,7 @@ public: // メンバ関数
 	void Draw();
 	//パーティクルの追加
 	void Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
-		float start_scale, float end_scale, XMFLOAT4 color);
+		float start_scale, float end_scale, XMFLOAT4 start_color, XMFLOAT4 end_color);
 
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBuff; // 定数バッファ

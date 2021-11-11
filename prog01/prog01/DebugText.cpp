@@ -56,6 +56,18 @@ void DebugText::Print(const std::string& text, float x, float y, float scale = 1
 	}
 }
 
+void DebugText::VariablePrint(float x, float y, const std::string& text, float i, float size = 1.0f)
+{
+	variable.m128_f32[0] = i;
+
+	std::ostringstream spherestr;
+	spherestr << text + " : "
+		<< std::fixed << std::setprecision(2)
+		<< variable.m128_f32[0];
+
+	Print(spherestr.str(), x, y, size);
+}
+
 // ‚Ü‚Æ‚ß‚Ä•`‰æ
 void DebugText::DrawAll(ID3D12GraphicsCommandList* cmdList)
 {
