@@ -46,6 +46,87 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 		return result;
 	}
 
+	//初期化（一度だけ行う処理）
+	result = DirectInput8Create
+	(
+		hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinputPad, nullptr
+	);
+	if (FAILED(result))
+	{
+		assert(0);
+		return result;
+	}
+
+	// デバイスの列挙
+	if (FAILED(dinputPad->EnumDevices(DI8DEVTYPE_GAMEPAD, DeviceFindCallBack, &parameter, DIEDFL_ATTACHEDONLY)))
+	{
+		assert(0);
+		return result;
+	}
+
+	result = dinputPad->CreateDevice(GUID_Joystick, &devGamePad, NULL);
+	if (FAILED(result))
+	{
+		padFlag = false;
+	}
+
+	if (padFlag == true)
+	{
+		// デバイスのフォーマットの設定
+		result = devGamePad->SetDataFormat(&c_dfDIJoystick);
+		if (FAILED(result))
+		{
+			assert(0);
+			return result;
+		}
+
+		// 軸モードを絶対値モードとして設定
+		//ZeroMemory(&diprop, sizeof(diprop));
+		diprop.diph.dwSize = sizeof(diprop);
+		diprop.diph.dwHeaderSize = sizeof(diprop.diph);
+		diprop.diph.dwHow = DIPH_DEVICE;
+		diprop.diph.dwObj = 0;
+		diprop.dwData = DIPROPAXISMODE_ABS;	// 絶対値モードの指定(DIPROPAXISMODE_RELにしたら相対値)
+		// 軸モードを変更
+		result = devGamePad->SetProperty(DIPROP_AXISMODE, &diprop.diph);
+		if (FAILED(result))
+		{
+			assert(0);
+			return result;
+		}
+
+		// X軸の値の範囲設定
+		ZeroMemory(&diprg, sizeof(diprg));
+		diprg.diph.dwSize = sizeof(diprg);
+		diprg.diph.dwHeaderSize = sizeof(diprg.diph);
+		diprg.diph.dwHow = DIPH_BYOFFSET;
+		diprg.diph.dwObj = DIJOFS_X;
+		diprg.lMin = -1000;
+		diprg.lMax = 1000;
+		result = devGamePad->SetProperty(DIPROP_RANGE, &diprg.diph);
+		if (FAILED(result))
+		{
+			assert(0);
+			return result;
+		}
+
+		// Y軸の値の範囲設定
+		diprg.diph.dwObj = DIJOFS_Y;
+		result = devGamePad->SetProperty(DIPROP_RANGE, &diprg.diph);
+		if (FAILED(result))
+		{
+			assert(0);
+			return result;
+		}
+
+		result = devGamePad->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+		if (FAILED(result))
+		{
+			assert(0);
+			return result;
+		}
+	}
+
 	return true;
 }
 
@@ -59,6 +140,16 @@ void Input::Update()
 	memcpy(keyPre, key, sizeof(key));
 	//全キーの入力状態を取得する
 	result = devkeyboard->GetDeviceState(sizeof(key), key);
+
+	if (padFlag == true)
+	{
+		// 制御開始
+		result = devGamePad->Acquire();
+		// 前回のキー入力を保存
+		memcpy(&padDataPre, &padData, sizeof(padData));
+		// ゲームパッドの入力情報取得
+		result = devGamePad->GetDeviceState(sizeof(padData), &padData);
+	}
 }
 
 bool Input::PushKey(BYTE keyNumber)
@@ -83,6 +174,79 @@ bool Input::TriggerKey(BYTE keyNumber)
 
 	// 前回が0で、今回が0でなければトリガー
 	if (!keyPre[keyNumber] && key[keyNumber])
+	{
+		return true;
+	}
+
+	// トリガーでない
+	return false;
+}
+
+BOOL CALLBACK Input::DeviceFindCallBack(LPCDIDEVICEINSTANCE ipddi, LPVOID pvRef)
+{
+	return DIENUM_CONTINUE;
+}
+
+bool Input::PushPadStickUp()
+{
+	if (padData.lY < -angle && padData.lX < angle * 4.3f &&
+		padData.lY < -angle && padData.lX > -angle * 4.2f)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Input::PushPadStickDown()
+{
+	if (padData.lY > angle && padData.lX < angle * 4.2f &&
+		padData.lY > angle && padData.lX > -angle * 4.2f)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Input::PushPadStickRight()
+{
+	if (padData.lX > angle && padData.lY > -angle * 4.3f &&
+		padData.lX > angle && padData.lY < angle * 4.2f)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Input::PushPadStickLeft()
+{
+	if (padData.lX < -angle && padData.lY < angle * 4.2f &&
+		padData.lX < -angle && padData.lY > -angle * 4.2f)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Input::PushPadKey(PadKey keyNumber)
+{
+	// 0でなければ押している
+	if (padData.rgbButtons[keyNumber])
+	{
+		return true;
+	}
+
+	// 押していない
+	return false;
+}
+
+bool Input::TriggerPadKey(PadKey keyNumber)
+{
+	// 前回が0で、今回が0でなければトリガー
+	if (!padDataPre.rgbButtons[keyNumber] && padData.rgbButtons[keyNumber])
 	{
 		return true;
 	}

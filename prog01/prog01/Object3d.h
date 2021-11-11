@@ -46,8 +46,6 @@ public: // 静的メンバ関数
 	static const XMFLOAT3& GetTarget() { return target; }
 	// 注視点座標の設定
 	static void SetTarget(XMFLOAT3 target);
-	// ベクトルによる移動
-	static void CameraMoveVector(XMFLOAT3 move);
 
 private: // 静的メンバ変数
 	// デバイス
@@ -68,6 +66,10 @@ private: // 静的メンバ変数
 	static XMFLOAT3 target;
 	// 上方向ベクトル
 	static XMFLOAT3 up;
+	// ビルボード行列
+	static XMMATRIX matBillboard;
+	// Y軸回りビルボード行列
+	static XMMATRIX matBillboardY;
 
 private:// 静的メンバ関数
 	// カメラ初期化
@@ -97,6 +99,8 @@ public: // メンバ関数
 	void SetScale(XMFLOAT3 scale) { this->scale = scale; }
 	// モデルの設定
 	void SetModel(Model* model) { this->model = model; };
+	// ビルボードの設定
+	void SetBillboard(bool isBillboard) { this->isBillboard = isBillboard; }
 
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
@@ -112,6 +116,8 @@ private: // メンバ変数
 	XMMATRIX matWorld;
 	// 親オブジェクト
 	Object3d* parent = nullptr;
-
+	// モデル
 	Model* model = nullptr;
+	// ビルボード
+	bool isBillboard = false;
 };
