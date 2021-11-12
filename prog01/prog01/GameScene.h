@@ -10,6 +10,7 @@
 #include "Audio.h"
 #include "Model.h"
 #include "ParticleManager.h"
+#include "Camera.h"
 
 class GameScene
 {
@@ -39,6 +40,7 @@ public://メンバ関数
 	void Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio);//初期化
 	void Update();//毎フレーム処理
 	void Draw();//描画
+	void StartCameraMove(); //最初のカメラの動き
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
@@ -52,7 +54,7 @@ private: // メンバ変数
 	Sprite* gameBack = nullptr;//ゲーム
 	Sprite* endBack = nullptr;//エンド
 	Model* modelFighter = nullptr;
-	
+
 	Object3d* baseObj = nullptr;//フィールド
 	Object3d* playerObj = nullptr;//プレイヤー
 	Object3d* enemyObj = nullptr;//エネミー
@@ -85,8 +87,9 @@ private: // メンバ変数
 	float pBullSpeedX[255], pBullSpeedY[255];//プレイヤーの弾の挙動用
 	float pBullX[255], pBullY[255], pBullXY[255];//プレイヤーの弾の挙動用
 	float speed = 2.0f;
+	float accel = 1.5f;//加速の倍率
 
-	int enemyHP = 100;//敵の体力
+	int enemyHP = 10;//敵の体力
 	int eDamageInterval = 50;//敵の被弾時の無敵時間
 	XMFLOAT3 ePos = { 0, 0, 0 };//敵の座標
 	XMFLOAT3 eScale = { 5, 5, 5 };//敵の大きさ
@@ -100,4 +103,10 @@ private: // メンバ変数
 	float aroundZ = 0.0f;
 
 	XMVECTOR hoge;
+
+	Camera* camera = nullptr;
+	XMFLOAT3 fixedCamera;
+	XMFLOAT3 fixed = camera->GetEye();
+	XMVECTOR cameraMove = { 0, 80, 140 };
+	bool cameraMoveCount[14];
 };

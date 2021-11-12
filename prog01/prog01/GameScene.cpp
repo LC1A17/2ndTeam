@@ -37,7 +37,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	{
 		assert(0);
 	}
-	
+
 	//デバッグテキスト初期化
 	debugText.Initialize(debugTextTexNumber);
 
@@ -125,6 +125,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	//サウンド再生
 	//audio->PlayWave("Resources/Alarm01.wav");
+
+	for (int i = 0; i < _countof(cameraMoveCount); i++)
+	{
+		cameraMoveCount[i] = true;
+	}
+
+	camera->Update();
 }
 
 //更新処理
@@ -159,11 +166,26 @@ void GameScene::Update()
 		pPos.x = posX + aroundX;
 		pPos.z = posZ + aroundZ;
 
-		playerObj->SetPosition({ pPos });
+		if (!cameraMoveCount[13])
+		{
+			playerObj->SetPosition({ pPos });
+
+			fixedCamera.x = cos(rad) * len * 2.1f;
+			fixedCamera.y = fixed.y;
+			fixedCamera.z = sin(rad) * len * 2.1f;
+
+			camera->SetEye(fixedCamera);
+		}
 
 		//入力処理
+		//デバッグ用。Rキーでエンド
+		if (input->TriggerKey(DIK_R) && !cameraMoveCount[13])
+		{
+			sceneNum = End;
+		}
+
 		//軸を移動
-		if (input->TriggerKey(DIK_UP))
+		if (input->TriggerKey(DIK_UP) && !cameraMoveCount[13])
 		{
 			//内側へ移動
 			//一番内側にいないなら移動
@@ -173,7 +195,7 @@ void GameScene::Update()
 			}
 		}
 
-		else if (input->TriggerKey(DIK_DOWN))
+		else if (input->TriggerKey(DIK_DOWN) && !cameraMoveCount[13])
 		{
 			//外側へ移動
 			//一番外側にいないなら移動
@@ -202,20 +224,38 @@ void GameScene::Update()
 		}
 
 		//円周上を移動
-		if (input->PushKey(DIK_LEFT))
+		if (input->PushKey(DIK_LEFT) && !cameraMoveCount[13])
 		{
 			//反時計回りに移動
-			angle -= speed;
+			//LSHIFTを押している時は加速
+			if (input->PushKey(DIK_LSHIFT))
+			{
+				angle -= speed * accel;
+			}
+
+			else
+			{
+				angle -= speed;
+			}
 		}
 
-		if (input->PushKey(DIK_RIGHT))
+		if (input->PushKey(DIK_RIGHT) && !cameraMoveCount[13])
 		{
 			//時計回りに移動
-			angle += speed;
+			//LSHIFTを押している時は加速
+			if (input->PushKey(DIK_LSHIFT))
+			{
+				angle += speed * accel;
+			}
+
+			else
+			{
+				angle += speed;
+			}
 		}
 
 		//弾を発射
-		if (input->PushKey(DIK_SPACE))
+		if (input->PushKey(DIK_SPACE) && !cameraMoveCount[13])
 		{
 			if (pBullInterval >= 30)
 			{
@@ -296,6 +336,12 @@ void GameScene::Update()
 			sceneNum = End;
 		}
 
+		//ボスの体力が0になったら終了
+		if (enemyHP <= 0)
+		{
+			sceneNum = End;
+		}
+
 		debugText.Print("Game", 0, 0, 1.0f);
 	}
 
@@ -305,6 +351,30 @@ void GameScene::Update()
 		//スペースを押すとタイトルに戻る
 		if (input->TriggerKey(DIK_SPACE))
 		{
+			for (int i = 0; i < _countof(cameraMoveCount); i++)
+			{
+				cameraMoveCount[i] = true;
+			}
+
+			for (int i = 0; i < 255; i++)
+			{
+				isWall[i] = false;
+				pBull[i] = false;
+			}
+			
+			cameraMove = { 0, 80, 140 };
+			circle = 2;//プレイヤーのいる円周の位置。1が最低値で数が大きい方が外側
+			maxCircle = 3;//現在の円周の最大数
+			playerHP = 100;//プレイヤーの体力
+			pPos = { 0, 0, 95 };//プレイヤーの座標
+			pRot = { 0, 0, 0 };//プレイヤーの傾き
+			pBullInterval = 30;
+			speed = 2.0f;
+			enemyHP = 10;//敵の体力
+			ePos = { 0, 0, 0 };//敵の座標
+			eDamageInterval = 50;//敵の被弾時の無敵時間
+			angle = 90.0f;
+			len = 60.0f;
 			sceneNum = Title;
 		}
 
@@ -312,15 +382,6 @@ void GameScene::Update()
 	}
 
 	debugText.Print(spherestr.str(), 50, 180, 1.0f);
-	baseObj->SetEye({ 0,180,1 });
-	playerObj->SetEye({ 0,180,1 });
-	enemyObj->SetEye({ 0,180,1 });
-
-	for (int i = 0; i < 255; i++)
-	{
-		bulletObj[i]->SetEye({ 0,180,1 });
-		wallObj[i]->SetEye({ 0,180,1 });
-	}
 
 	baseObj->Update();
 	playerObj->Update();
@@ -331,6 +392,13 @@ void GameScene::Update()
 		bulletObj[i]->Update();
 		wallObj[i]->Update();
 	}
+
+	if (cameraMoveCount[13])
+	{
+		StartCameraMove();
+	}
+
+	camera->Update();
 
 	/*
 	for (int i = 0; i < 10; i++)
@@ -357,7 +425,6 @@ void GameScene::Update()
 		color.x = (float)rand() / RAND_MAX * 1;
 		color.y = (float)rand() / RAND_MAX * 1;
 		color.z = (float)rand() / RAND_MAX * 1;
-
 		//追加
 		particleMan->Add(60, pos, vel, acc, 1.0f, 0.0f, color);
 	}
@@ -374,7 +441,7 @@ void GameScene::Draw()
 #pragma region 背景スプライト描画
 
 	Sprite::PreDraw(dxCommon->GetCommandList());//背景スプライト描画前処理
-	
+
 	if (sceneNum == Title)
 	{
 		titleBack->Draw();//背景スプライト描画
@@ -384,7 +451,7 @@ void GameScene::Draw()
 	{
 		gameBack->Draw();//背景スプライト描画
 	}
-	
+
 	else if (sceneNum == End)
 	{
 		endBack->Draw();//背景スプライト描画
@@ -398,7 +465,7 @@ void GameScene::Draw()
 #pragma region 3Dオブジェクト描画
 
 	Object3d::PreDraw(dxCommon->GetCommandList());//3Dオブジェクト描画前処理
-	
+
 	//3Dオブジェクトの描画
 	if (sceneNum == Title)
 	{
@@ -425,7 +492,7 @@ void GameScene::Draw()
 		}
 	}
 
-	else if (sceneNum -= End)
+	else if (sceneNum == End)
 	{
 
 	}
@@ -450,4 +517,139 @@ void GameScene::Draw()
 	Sprite::PostDraw();//スプライト描画後処理
 
 #pragma endregion 前景スプライト描画
+}
+
+void GameScene::StartCameraMove()
+{
+	if (cameraMove.m128_f32[0] >= -140 && cameraMoveCount[0])
+	{
+		cameraMove.m128_f32[0] -= 1;
+
+		if (cameraMove.m128_f32[0] <= -140)
+		{
+			cameraMoveCount[0] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[0] <= 0 && cameraMoveCount[3])
+	{
+		cameraMove.m128_f32[0] += 1;
+
+		if (cameraMove.m128_f32[0] >= 0)
+		{
+			cameraMoveCount[3] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[0] <= 140 && cameraMoveCount[6])
+	{
+		cameraMove.m128_f32[0] += 1;
+
+		if (cameraMove.m128_f32[0] >= 140)
+		{
+			cameraMoveCount[6] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[0] >= 0 && cameraMoveCount[9])
+	{
+		cameraMove.m128_f32[0] -= 1;
+
+		if (cameraMove.m128_f32[0] <= 0)
+		{
+			cameraMoveCount[9] = false;
+		}
+	}
+
+	if (cameraMove.m128_f32[1] <= 105 && cameraMoveCount[1])
+	{
+		cameraMove.m128_f32[1] += 0.2f;
+
+		if (cameraMove.m128_f32[1] >= 105)
+		{
+			cameraMoveCount[1] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[1] <= 130 && cameraMoveCount[4])
+	{
+		cameraMove.m128_f32[1] += 0.2f;
+
+		if (cameraMove.m128_f32[1] >= 130)
+		{
+			cameraMoveCount[4] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[1] <= 155 && cameraMoveCount[7])
+	{
+		cameraMove.m128_f32[1] += 0.2f;
+
+		if (cameraMove.m128_f32[1] >= 155)
+		{
+			cameraMoveCount[7] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[1] <= 180 && cameraMoveCount[10])
+	{
+		cameraMove.m128_f32[1] += 0.2f;
+
+		if (cameraMove.m128_f32[1] >= 180)
+		{
+			cameraMoveCount[10] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[1] >= 80 && cameraMoveCount[12])
+	{
+		cameraMove.m128_f32[1] -= 2;
+
+		if (cameraMove.m128_f32[1] <= 80)
+		{
+			cameraMoveCount[12] = false;
+		}
+	}
+
+	if (cameraMove.m128_f32[2] >= 0 && cameraMoveCount[2])
+	{
+		cameraMove.m128_f32[2] -= 1;
+
+		if (cameraMove.m128_f32[2] <= 0)
+		{
+			cameraMoveCount[2] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[2] >= -140 && cameraMoveCount[5])
+	{
+		cameraMove.m128_f32[2] -= 1;
+
+		if (cameraMove.m128_f32[2] <= -140)
+		{
+			cameraMoveCount[5] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[2] <= 0 && cameraMoveCount[8])
+	{
+		cameraMove.m128_f32[2] += 1;
+
+		if (cameraMove.m128_f32[2] >= 0)
+		{
+			cameraMoveCount[8] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[2] <= 40 && cameraMoveCount[11])
+	{
+		cameraMove.m128_f32[2] += 0.15;
+
+		if (cameraMove.m128_f32[2] >= 20)
+		{
+			cameraMoveCount[11] = false;
+		}
+	}
+	else if (cameraMove.m128_f32[2] <= sin(rad) * len * 2.1f && cameraMoveCount[13])
+	{
+		cameraMove.m128_f32[2] += 2;
+
+		if (cameraMove.m128_f32[2] >= sin(rad) * len * 2.1f)
+		{
+			cameraMove.m128_f32[2] = sin(rad) * len * 2.1f;
+			cameraMoveCount[13] = false;
+		}
+	}
+
+	camera->SetEye({ cameraMove.m128_f32[0], cameraMove.m128_f32[1], cameraMove.m128_f32[2] });
 }
