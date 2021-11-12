@@ -10,6 +10,7 @@
 #include "Audio.h"
 #include "Model.h"
 #include "ParticleManager.h"
+#include "Camera.h"
 
 class GameScene
 {
@@ -39,6 +40,7 @@ public://メンバ関数
 	void Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio);//初期化
 	void Update();//毎フレーム処理
 	void Draw();//描画
+	void StartCameraMove(); //最初のカメラの動き
 
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
@@ -100,4 +102,10 @@ private: // メンバ変数
 	float aroundZ = 0.0f;
 
 	XMVECTOR hoge;
+
+	Camera* camera = nullptr;
+	XMFLOAT3 fixedCamera;
+	XMFLOAT3 fixed = camera->GetEye();
+	XMVECTOR cameraMove = { 0, 80, 140 };
+	bool cameraMoveCount[14];
 };
