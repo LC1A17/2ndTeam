@@ -37,7 +37,7 @@ void ParticleEmitter::Update()
 	particleMan->Update();
 }
 
-void ParticleEmitter::Draw()
+void ParticleEmitter::Draw(ID3D12GraphicsCommandList* cmdList)
 {
-	particleMan->Draw();
+	particleMan->Draw(cmdList);
 }

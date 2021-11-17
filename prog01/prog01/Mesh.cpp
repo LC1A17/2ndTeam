@@ -54,7 +54,6 @@ void Mesh::CreateBuffers()
 	// 頂点バッファへのデータ転送
 	VertexPosNormalUv* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
-	
 	if (SUCCEEDED(result))
 	{
 		std::copy(vertices.begin(), vertices.end(), vertMap);
@@ -73,7 +72,6 @@ void Mesh::CreateBuffers()
 	}
 
 	UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * indices.size());
-	
 	// インデックスバッファ生成
 	result = device->CreateCommittedResource
 	(
@@ -84,7 +82,6 @@ void Mesh::CreateBuffers()
 		nullptr,
 		IID_PPV_ARGS(&indexBuff)
 	);
-
 	if (FAILED(result))
 	{
 		assert(0);

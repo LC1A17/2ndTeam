@@ -19,6 +19,7 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 		return result;
 	}
 
+#pragma region キーボード
 	//キーボードデバイスの生成
 	result = dinput->CreateDevice(GUID_SysKeyboard, &devkeyboard, NULL);
 	if (FAILED(result))
@@ -45,7 +46,33 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 		assert(0);
 		return result;
 	}
+#pragma endregion
+#pragma region マウス
+	// マウスデバイスの生成	
+	result = dinput->CreateDevice(GUID_SysMouse, &devMouse, NULL);
+	if (FAILED(result))
+	{
+		assert(0);
+		return result;
+	}
 
+	// 入力データ形式のセット
+	result = devMouse->SetDataFormat(&c_dfDIMouse2); // 標準形式
+	if (FAILED(result))
+	{
+		assert(0);
+		return result;
+	}
+
+	// 排他制御レベルのセット
+	result = devMouse->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	if (FAILED(result))
+	{
+		assert(0);
+		return result;
+	}
+#pragma endregion
+#pragma region ゲームパッド
 	//初期化（一度だけ行う処理）
 	result = DirectInput8Create
 	(
@@ -126,6 +153,7 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hwnd)
 			return result;
 		}
 	}
+#pragma endregion
 
 	return true;
 }
@@ -134,13 +162,23 @@ void Input::Update()
 {
 	HRESULT result;
 
+#pragma region キーボード
 	//キーボード情報の取得開始
 	result = devkeyboard->Acquire();
 	// 前回のキー入力を保存
 	memcpy(keyPre, key, sizeof(key));
 	//全キーの入力状態を取得する
 	result = devkeyboard->GetDeviceState(sizeof(key), key);
-
+#pragma endregion
+#pragma region マウス
+	//マウス情報の取得開始
+	result = devMouse->Acquire();
+	// 前回のキー入力を保存
+	memcpy(&mouseStatePre, &mouseState, sizeof(mouseState));
+	//マウスの入力状態を取得する
+	result = devMouse->GetDeviceState(sizeof(mouseState), &mouseState);
+#pragma endregion
+#pragma region ゲームパッド
 	if (padFlag == true)
 	{
 		// 制御開始
@@ -150,6 +188,7 @@ void Input::Update()
 		// ゲームパッドの入力情報取得
 		result = devGamePad->GetDeviceState(sizeof(padData), &padData);
 	}
+#pragma endregion
 }
 
 bool Input::PushKey(BYTE keyNumber)
@@ -253,4 +292,85 @@ bool Input::TriggerPadKey(PadKey keyNumber)
 
 	// トリガーでない
 	return false;
+}
+
+bool Input::PushMouseLeft()
+{
+	// 0でなければ押している
+	if (mouseState.rgbButtons[0])
+	{
+		return true;
+	}
+
+	// 押していない
+	return false;
+}
+
+bool Input::PushMouseMiddle()
+{
+	// 0でなければ押している
+	if (mouseState.rgbButtons[2])
+	{
+		return true;
+	}
+
+	// 押していない
+	return false;
+}
+
+bool Input::PushMouseRight()
+{
+	// 0でなければ押している
+	if (mouseState.rgbButtons[1])
+	{
+		return true;
+	}
+
+	// 押していない
+	return false;
+}
+
+bool Input::TriggerMouseLeft()
+{
+	// 前回が0で、今回が0でなければトリガー
+	if (!mouseStatePre.rgbButtons[0] && mouseState.rgbButtons[0])
+	{
+		return true;
+	}
+
+	// トリガーでない
+	return false;
+}
+
+bool Input::TriggerMouseMiddle()
+{
+	// 前回が0で、今回が0でなければトリガー
+	if (!mouseStatePre.rgbButtons[2] && mouseState.rgbButtons[2])
+	{
+		return true;
+	}
+
+	// トリガーでない
+	return false;
+}
+
+bool Input::TriggerMouseRight()
+{
+	// 前回が0で、今回が0でなければトリガー
+	if (!mouseStatePre.rgbButtons[1] && mouseState.rgbButtons[1])
+	{
+		return true;
+	}
+
+	// トリガーでない
+	return false;
+}
+
+Input::MouseMove Input::GetMouseMove()
+{
+	MouseMove tmp;
+	tmp.lX = mouseState.lX;
+	tmp.lY = mouseState.lY;
+	tmp.lZ = mouseState.lZ;
+	return tmp;
 }
