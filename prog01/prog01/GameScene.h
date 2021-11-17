@@ -59,7 +59,7 @@ private: // メンバ変数
 	Object3d* playerObj = nullptr;//プレイヤー
 	Object3d* enemyObj = nullptr;//エネミー
 	Object3d* bulletObj[255] = { nullptr };//弾
-	Object3d* wallObj[255] = { nullptr };//弾
+	Object3d* wallObj[30] = { nullptr };//弾
 
 	ParticleManager* particleMan = nullptr;
 
@@ -71,14 +71,15 @@ private: // メンバ変数
 
 	XMFLOAT3 basePos = { 0,0,5 };//土台の座標
 	XMFLOAT3 baseScale = { 100,100,100 };//土台のスケール
-	XMFLOAT3 wallPos[255];//壁の座標
-	XMFLOAT3 wallScale[255];//壁のスケール
-	bool isWall[255] = { false };//壁が出ているか
+	XMFLOAT3 wallPos[30];//壁の座標
+	XMFLOAT3 wallRota[30];//壁の向き
+	XMFLOAT3 wallScale[30];//壁のスケール
+	bool isWall[30] = { false };//壁が出ているか
 
 	int playerHP = 100;//プレイヤーの体力
 	XMFLOAT3 pPos = { 0, 0, 95 };//プレイヤーの座標
 	XMFLOAT3 pRot = { 0, 0, 0 };//プレイヤーの傾き
-	XMFLOAT3 pScale = { 10, 10, 10 };//プレイヤーの大きさ
+	XMFLOAT3 pScale = { 5, 5, 5 };//プレイヤーの大きさ
 	XMFLOAT3 pOldPos[255];//プレイヤーの座標
 	XMFLOAT3 pBullPos[255];//プレイヤーの弾の座標
 	XMFLOAT3 pBullScale[255];//プレイヤーの弾の大きさ
@@ -93,6 +94,14 @@ private: // メンバ変数
 	int eDamageInterval = 50;//敵の被弾時の無敵時間
 	XMFLOAT3 ePos = { 0, 0, 0 };//敵の座標
 	XMFLOAT3 eScale = { 5, 5, 5 };//敵の大きさ
+	int eAttackInterval = 0;//敵の行動の間隔
+	int wallCount = 0;
+
+	/*
+	bool eBull[255] = { false };//敵の弾が画面上に出ているかどうか
+	float eBullSpeedX[255], eBullSpeedY[255];//敵の弾の挙動用
+	float eBullX[255], eBullY[255], eBullXY[255];//敵の弾の挙動用
+	*/
 
 	float posX = 0.0f;
 	float posZ = 0.0f;

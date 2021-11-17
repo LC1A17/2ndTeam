@@ -42,11 +42,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	debugText.Initialize(debugTextTexNumber);
 
 	//テクスチャ読み込み
-	if (!Sprite::LoadTexture(1, L"Resources/APEX_01.png"))
-	{
-		assert(0);
-	}
-
 	if (!Sprite::LoadTexture(2, L"Resources/title.png"))
 	{
 		assert(0);
@@ -63,10 +58,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	}
 
 	//背景スプライト生成
-	sprite = Sprite::Create(1, { 0.0f,0.0f });
-	sprite->SetSize({ 100.0f,100.0f });
-	sprite->SetPosition({ 100.0f,100.0f });
-
 	titleBack = Sprite::Create(2, { 0.0f,0.0f });
 	titleBack->SetSize({ WinApp::window_width, WinApp::window_height });
 	titleBack->SetPosition({ 0.0f,0.0f });
@@ -102,22 +93,31 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyObj->SetScale({ eScale });
 
 	//弾
+	modelFighter = modelFighter->CreateFromObject("bullet");
+
 	for (int i = 0; i < 255; i++)
 	{
 		pOldPos[i] = { 1000, 1000, 1000 };
 		pBullPos[i] = { 1000, 1000, 1000 };
 		pBullScale[i] = { 10, 10, 10 };
-
-		modelFighter = modelFighter->CreateFromObject("bullet");
 		bulletObj[i] = Object3d::Create();
 		bulletObj[i]->SetModel(modelFighter);
 		bulletObj[i]->SetPosition({ pBullPos[i] });
 		bulletObj[i]->SetScale({ pBullScale[i] });
+	}
 
-		modelFighter = modelFighter->CreateFromObject("wall");
+	//壁
+	modelFighter = modelFighter->CreateFromObject("wall");
+
+	for (int i = 0; i < 30; i++)
+	{
+		wallPos[i] = { 1000, 1000, 1000 };
+		wallRota[i] = { 0, 0, 0 };
+		wallScale[i] = { 10, 10, 10 };
 		wallObj[i] = Object3d::Create();
 		wallObj[i]->SetModel(modelFighter);
 		wallObj[i]->SetPosition({ wallPos[i] });
+		wallObj[i]->SetRotation({ wallRota[i] });
 		wallObj[i]->SetScale({ wallScale[i] });
 	}
 
@@ -283,6 +283,16 @@ void GameScene::Update()
 		//更新処理
 		pBullInterval++;
 		eDamageInterval++;
+		eAttackInterval++;
+
+		//壁の数
+		for (int i = 0; i < 30; i++)
+		{
+			if (isWall[i] == true)
+			{
+				wallCount++;
+			}
+		}
 
 		//プレイヤーの弾
 		for (int i = 0; i < 255; i++)
@@ -319,6 +329,45 @@ void GameScene::Update()
 					pBull[i] = false;
 					eDamageInterval = 0;
 				}
+			}
+
+			//ボスの挙動
+			if (eAttackInterval >= 50)
+			{
+				//プレイヤーの位置を参照
+				if (circle == 1)
+				{
+
+				}
+
+				else if (circle == 2)
+				{
+					if (wallCount <= 10)
+					{
+						for (int i = 0; i < 30; i++)
+						{
+							if (isWall[i] == false)
+							{
+								wallPos[i] = { 30, 0, 0 };
+								isWall[i] = true;
+								wallObj[i]->SetPosition({ wallPos[i] });
+								break;
+							}
+						}
+					}
+				}
+
+				else if (circle == 3)
+				{
+
+				}
+
+				else
+				{
+
+				}
+
+				eAttackInterval = 0;
 			}
 
 			//画面外に出た弾をfalseにする
@@ -359,6 +408,10 @@ void GameScene::Update()
 			for (int i = 0; i < 255; i++)
 			{
 				isWall[i] = false;
+			}
+
+			for (int i = 0; i < 255; i++)
+			{
 				pBull[i] = false;
 			}
 			
@@ -484,7 +537,10 @@ void GameScene::Draw()
 			{
 				bulletObj[i]->Draw();
 			}
+		}
 
+		for (int i = 0; i < 30; i++)
+		{
 			if (isWall[i] == true)
 			{
 				wallObj[i]->Draw();
