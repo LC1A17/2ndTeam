@@ -167,8 +167,8 @@ void GameScene::Update()
 	{
 		rad = angle * 3.14f / 180.0f;
 
-		aroundX = cos(rad) * len;
-		aroundZ = sin(rad) * len;
+		aroundX = cos(rad) * len / i;
+		aroundZ = sin(rad) * len / i;
 
 		pPos.x = posX + aroundX;
 		pPos.z = posZ + aroundZ;
@@ -183,6 +183,25 @@ void GameScene::Update()
 
 			camera->SetEye(fixedCamera);
 		}
+
+		if (input->TriggerKey(DIK_1) && !cameraMoveCount[13] && i >= 1.0f)
+		{
+			hit = true;
+		}
+
+		if (hit)
+		{
+			i -= 0.01f;
+			if (i <= 0.8f && hit)
+			{
+				hit = false;
+			}
+		}
+		else if (!hit && i <= 1.0f)
+		{
+			i += 0.05f;
+		}
+
 
 		//入力処理
 		//デバッグ用。Rキーでエンド

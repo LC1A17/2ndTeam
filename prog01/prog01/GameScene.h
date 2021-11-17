@@ -119,4 +119,7 @@ private: // ƒƒ“ƒo•Ï”
 	XMFLOAT3 fixed = camera->GetEye();
 	XMVECTOR cameraMove = { 0, 80, 140 };
 	bool cameraMoveCount[14];
+
+	float i = 1.0f;
+	bool hit = false;
 };
