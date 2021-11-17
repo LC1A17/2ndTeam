@@ -58,6 +58,7 @@ private: // メンバ変数
 	Object3d* baseObj = nullptr;//フィールド
 	Object3d* playerObj = nullptr;//プレイヤー
 	Object3d* enemyObj = nullptr;//エネミー
+	Object3d* eArmObj = nullptr;//エネミーの腕
 	Object3d* pBulletObj[255] = { nullptr };//弾
 	Object3d* eBulletObj[255] = { nullptr };//弾
 	Object3d* wallObj[30] = { nullptr };//弾
@@ -103,6 +104,12 @@ private: // メンバ変数
 	bool eBull[255] = { false };//敵の弾が画面上に出ているかどうか
 	float eBullSpeedX[255], eBullSpeedY[255];//敵の弾の挙動用
 	float eBullX[255], eBullY[255], eBullXY[255];//敵の弾の挙動用
+
+	XMFLOAT3 eArmPos = { 0, 0, 0 };//腕の座標
+	XMFLOAT3 eArmRot = { 0, 0, 0 };//腕の傾き
+	XMFLOAT3 eArmScale = { 60, 60, 60 };//腕の大きさ
+	bool eArm = false;//腕の表示
+	int eArmCount = 0;//腕の動作用
 
 	float posX = 0.0f;
 	float posZ = 0.0f;

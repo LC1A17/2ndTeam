@@ -104,13 +104,6 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		pBulletObj[i]->SetModel(modelFighter);
 		pBulletObj[i]->SetPosition({ pBullPos[i] });
 		pBulletObj[i]->SetScale({ pBullScale[i] });
-
-		eBullPos[i] = { 1000, 1000, 1000 };
-		eBullScale[i] = { 10, 10, 10 };
-		eBulletObj[i] = Object3d::Create();
-		eBulletObj[i]->SetModel(modelFighter);
-		eBulletObj[i]->SetPosition({ pBullPos[i] });
-		eBulletObj[i]->SetScale({ pBullScale[i] });
 	}
 
 	modelFighter = modelFighter->CreateFromObject("eBullet");
@@ -118,7 +111,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	for (int i = 0; i < 255; i++)
 	{
 		eBullPos[i] = { 1000, 1000, 1000 };
-		eBullScale[i] = { 10, 10, 10 };
+		eBullScale[i] = { 20, 20, 20 };
 		eBulletObj[i] = Object3d::Create();
 		eBulletObj[i]->SetModel(modelFighter);
 		eBulletObj[i]->SetPosition({ pBullPos[i] });
@@ -139,6 +132,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		wallObj[i]->SetRotation({ wallRota[i] });
 		wallObj[i]->SetScale({ wallScale[i] });
 	}
+
+	//腕
+	modelFighter = modelFighter->CreateFromObject("enemyArm");
+	eArmObj = Object3d::Create();
+	eArmObj->SetModel(modelFighter);
+	eArmObj->SetPosition({ eArmPos });
+	eArmObj->SetRotation({ eArmRot });
+	eArmObj->SetScale({ eArmScale });
 
 	particleMan = ParticleManager::Create();
 
@@ -421,13 +422,37 @@ void GameScene::Update()
 			}
 		}
 
+		//腕
+		if (eArm == true)
+		{
+			eArmCount++;
+
+			if (eArmPos.y >= -300)
+			{
+				eArmPos.y -= 16;
+				eArmObj->SetPosition({ eArmPos });
+			}
+
+			if (eArmCount >= 90)
+			{
+				eArmCount = 0;
+				eArm = false;
+			}
+		}
+
 		//ボスの挙動
 		if (eAttackInterval >= 50)
 		{
 			//プレイヤーの位置を参照
 			if (circle == 1)
 			{
-
+				if (eArm == false)
+				{
+					eArmPos = pPos;
+					eArmPos.x += 120;
+					eArm = true;
+					eArmObj->SetPosition({ eArmPos });
+				}
 			}
 
 			else if (circle == 2)
@@ -541,6 +566,7 @@ void GameScene::Update()
 	baseObj->Update();
 	playerObj->Update();
 	enemyObj->Update();
+	eArmObj->Update();
 
 	for (int i = 0; i < 255; i++)
 	{
@@ -637,6 +663,11 @@ void GameScene::Draw()
 		baseObj->Draw();
 		playerObj->Draw();
 		enemyObj->Draw();
+
+		if (eArm == true)
+		{
+			eArmObj->Draw();
+		}
 
 		for (int i = 0; i < 255; i++)
 		{
