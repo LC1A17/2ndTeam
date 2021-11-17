@@ -189,19 +189,6 @@ void GameScene::Update()
 			hit = true;
 		}
 
-		if (hit)
-		{
-			i -= 0.01f;
-			if (i <= 0.8f && hit)
-			{
-				hit = false;
-			}
-		}
-		else if (!hit && i <= 1.0f)
-		{
-			i += 0.05f;
-		}
-
 		//入力処理
 		//デバッグ用。Rキーでエンド
 		if (input->TriggerKey(DIK_R) && !cameraMoveCount[13])
