@@ -22,7 +22,7 @@ public: // メンバ関数
 	// 毎フレーム処理
 	void Update();
 	// 描画
-	void Draw();
+	void Draw(ID3D12GraphicsCommandList* cmdList);
 
 	// 座標の設定
 	void SetCenter(const float md_pos) { this->md_pos = md_pos; }
