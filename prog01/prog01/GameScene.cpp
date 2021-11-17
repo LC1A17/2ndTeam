@@ -76,7 +76,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	modelFighter = modelFighter->CreateFromObject("base");
 	baseObj = Object3d::Create();
 	baseObj->SetModel(modelFighter);
-	baseObj->SetScale({ 100,100,100 });
+	baseObj->SetScale({ baseScale });
 
 	//ƒvƒŒƒCƒ„[
 	modelFighter = modelFighter->CreateFromObject("player");
@@ -99,7 +99,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	{
 		pOldPos[i] = { 1000, 1000, 1000 };
 		pBullPos[i] = { 1000, 1000, 1000 };
-		pBullScale[i] = { 10, 10, 10 };
+		pBullScale[i] = { 20, 20, 20 };
 		bulletObj[i] = Object3d::Create();
 		bulletObj[i]->SetModel(modelFighter);
 		bulletObj[i]->SetPosition({ pBullPos[i] });
@@ -113,7 +113,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	{
 		wallPos[i] = { 1000, 1000, 1000 };
 		wallRota[i] = { 0, 0, 0 };
-		wallScale[i] = { 10, 10, 10 };
+		wallScale[i] = { 20, 20, 20 };
 		wallObj[i] = Object3d::Create();
 		wallObj[i]->SetModel(modelFighter);
 		wallObj[i]->SetPosition({ wallPos[i] });
@@ -443,6 +443,10 @@ void GameScene::Update()
 	for (int i = 0; i < 255; i++)
 	{
 		bulletObj[i]->Update();
+	}
+
+	for (int i = 0; i < 30; i++)
+	{
 		wallObj[i]->Update();
 	}
 

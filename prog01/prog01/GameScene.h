@@ -70,7 +70,7 @@ private: // メンバ変数
 	int maxCircle = 3;//現在の円周の最大数
 
 	XMFLOAT3 basePos = { 0,0,5 };//土台の座標
-	XMFLOAT3 baseScale = { 100,100,100 };//土台のスケール
+	XMFLOAT3 baseScale = { 200, 200, 200 };//土台のスケール
 	XMFLOAT3 wallPos[30];//壁の座標
 	XMFLOAT3 wallRota[30];//壁の向き
 	XMFLOAT3 wallScale[30];//壁のスケール
@@ -79,7 +79,7 @@ private: // メンバ変数
 	int playerHP = 100;//プレイヤーの体力
 	XMFLOAT3 pPos = { 0, 0, 95 };//プレイヤーの座標
 	XMFLOAT3 pRot = { 0, 0, 0 };//プレイヤーの傾き
-	XMFLOAT3 pScale = { 5, 5, 5 };//プレイヤーの大きさ
+	XMFLOAT3 pScale = { 10, 10, 10 };//プレイヤーの大きさ
 	XMFLOAT3 pOldPos[255];//プレイヤーの座標
 	XMFLOAT3 pBullPos[255];//プレイヤーの弾の座標
 	XMFLOAT3 pBullScale[255];//プレイヤーの弾の大きさ
@@ -93,7 +93,7 @@ private: // メンバ変数
 	int enemyHP = 10;//敵の体力
 	int eDamageInterval = 50;//敵の被弾時の無敵時間
 	XMFLOAT3 ePos = { 0, 0, 0 };//敵の座標
-	XMFLOAT3 eScale = { 5, 5, 5 };//敵の大きさ
+	XMFLOAT3 eScale = { 10, 10, 10 };//敵の大きさ
 	int eAttackInterval = 0;//敵の行動の間隔
 	int wallCount = 0;
 
