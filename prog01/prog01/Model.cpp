@@ -1,7 +1,16 @@
 #include "Model.h"
+#include <d3dcompiler.h>
+#include <DirectXTex.h>
+
+#pragma comment(lib, "d3dcompiler.lib")
+
+using namespace DirectX;
+using namespace Microsoft::WRL;
+
 #include <fstream>
 #include <sstream>
-
+#include <string>
+#include <vector>
 using namespace std;
 
 // Ã“Iƒƒ“ƒo•Ï”‚ÌÀ‘Ì

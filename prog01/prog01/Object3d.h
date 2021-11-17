@@ -6,7 +6,6 @@
 #include <DirectXMath.h>
 #include <d3dx12.h>
 #include "Model.h"
-#include "Camera.h"
 
 class Object3d
 {
@@ -32,17 +31,21 @@ private: // 定数
 
 public: // 静的メンバ関数
 	// 静的初期化
-	static void StaticInitialize(ID3D12Device* device, Camera* camera = nullptr);
-	// グラフィックパイプライン生成
-	static bool InitializeGraphicsPipeline();
+	static bool StaticInitialize(ID3D12Device* device, int window_width, int window_height);
 	// 描画前処理
 	static void PreDraw(ID3D12GraphicsCommandList* cmdList);
 	// 描画後処理
 	static void PostDraw();
 	// 3Dオブジェクト生成
 	static Object3d* Create();
-	// カメラのセット
-	static void SetCamera(Camera* camera) { Object3d::camera = camera; }
+	// 視点座標の取得
+	static const XMFLOAT3& GetEye() { return eye; }
+	// 視点座標の設定
+	static void SetEye(XMFLOAT3 eye);
+	// 注視点座標の取得
+	static const XMFLOAT3& GetTarget() { return target; }
+	// 注視点座標の設定
+	static void SetTarget(XMFLOAT3 target);
 
 private: // 静的メンバ変数
 	// デバイス
@@ -53,8 +56,28 @@ private: // 静的メンバ変数
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
-	// カメラ
-	static Camera* camera;
+	// ビュー行列
+	static XMMATRIX matView;
+	// 射影行列
+	static XMMATRIX matProjection;
+	// 視点座標
+	static XMFLOAT3 eye;
+	// 注視点座標
+	static XMFLOAT3 target;
+	// 上方向ベクトル
+	static XMFLOAT3 up;
+	// ビルボード行列
+	static XMMATRIX matBillboard;
+	// Y軸回りビルボード行列
+	static XMMATRIX matBillboardY;
+
+private:// 静的メンバ関数
+	// カメラ初期化
+	static void InitializeCamera(int window_width, int window_height);
+	// グラフィックパイプライン生成
+	static bool InitializeGraphicsPipeline();
+	// ビュー行列を更新
+	static void UpdateViewMatrix();
 
 public: // メンバ関数
 	bool Initialize();

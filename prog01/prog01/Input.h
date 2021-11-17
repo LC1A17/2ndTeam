@@ -31,13 +31,6 @@ public: // サブクラス
 		BUTTON_DPAD_RIGHT // デジタル方向ボタン右
 	};
 
-	struct MouseMove
-	{
-		LONG    lX;
-		LONG    lY;
-		LONG    lZ;
-	};
-
 public: //メンバ関数
 	//初期化
 	bool Initialize(HINSTANCE hInstance, HWND hwnd);
@@ -61,21 +54,6 @@ public: //メンバ関数
 	// キーのトリガーをチェック
 	bool TriggerPadKey(PadKey keyNumber);
 
-	// キーの左ボタン押下をチェック
-	bool PushMouseLeft();
-	// キーの中ボタン押下をチェック
-	bool PushMouseMiddle();
-	// キーの右ボタン押下をチェック
-	bool PushMouseRight();
-	// キーの左ボタントリガーをチェック
-	bool TriggerMouseLeft();
-	// キーの中ボタントリガーをチェック
-	bool TriggerMouseMiddle();
-	// キーの右ボタントリガーをチェック
-	bool TriggerMouseRight();
-	// マウス移動量を取得
-	MouseMove GetMouseMove();
-
 private: //メンバ変数
 	//キーボード
 	ComPtr<IDirectInput8> dinput;
@@ -98,9 +76,4 @@ private: //メンバ変数
 	DIJOYSTATE padDataPre;
 	//接続確認
 	bool padFlag = true;
-
-	//マウス
-	ComPtr<IDirectInputDevice8> devMouse;
-	DIMOUSESTATE2 mouseState = {};
-	DIMOUSESTATE2 mouseStatePre = {};
 };
