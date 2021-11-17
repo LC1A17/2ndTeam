@@ -113,6 +113,18 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		eBulletObj[i]->SetScale({ pBullScale[i] });
 	}
 
+	modelFighter = modelFighter->CreateFromObject("eBullet");
+
+	for (int i = 0; i < 255; i++)
+	{
+		eBullPos[i] = { 1000, 1000, 1000 };
+		eBullScale[i] = { 10, 10, 10 };
+		eBulletObj[i] = Object3d::Create();
+		eBulletObj[i]->SetModel(modelFighter);
+		eBulletObj[i]->SetPosition({ pBullPos[i] });
+		eBulletObj[i]->SetScale({ pBullScale[i] });
+	}
+
 	//•Ç
 	modelFighter = modelFighter->CreateFromObject("wall");
 
@@ -187,6 +199,19 @@ void GameScene::Update()
 		if (input->TriggerKey(DIK_1) && !cameraMoveCount[13] && i >= 1.0f)
 		{
 			hit = true;
+		}
+
+		if (hit)
+		{
+			i -= 0.01f;
+			if (i <= 0.8f && hit)
+			{
+				hit = false;
+			}
+		}
+		else if (!hit && i <= 1.0f)
+		{
+			i += 0.05f;
 		}
 
 		//“ü—Íˆ—
