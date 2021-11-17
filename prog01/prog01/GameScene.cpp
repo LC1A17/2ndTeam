@@ -93,7 +93,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	enemyObj->SetScale({ eScale });
 
 	//íe
-	modelFighter = modelFighter->CreateFromObject("bullet");
+	modelFighter = modelFighter->CreateFromObject("pBullet");
 
 	for (int i = 0; i < 255; i++)
 	{
@@ -167,8 +167,8 @@ void GameScene::Update()
 	{
 		rad = angle * 3.14f / 180.0f;
 
-		aroundX = cos(rad) * len;
-		aroundZ = sin(rad) * len;
+		aroundX = cos(rad) * len / i;
+		aroundZ = sin(rad) * len / i;
 
 		pPos.x = posX + aroundX;
 		pPos.z = posZ + aroundZ;
@@ -182,6 +182,24 @@ void GameScene::Update()
 			fixedCamera.z = sin(rad) * len * 2.4f;
 
 			camera->SetEye(fixedCamera);
+		}
+
+		if (input->TriggerKey(DIK_1) && !cameraMoveCount[13] && i >= 1.0f)
+		{
+			hit = true;
+		}
+
+		if (hit)
+		{
+			i -= 0.01f;
+			if (i <= 0.8f && hit)
+			{
+				hit = false;
+			}
+		}
+		else if (!hit && i <= 1.0f)
+		{
+			i += 0.05f;
 		}
 
 		//ì¸óÕèàóù
@@ -215,19 +233,16 @@ void GameScene::Update()
 		if (circle == 1)
 		{
 			len = 60.0f;
-			speed = 2.0f;
 		}
 
 		if (circle == 2)
 		{
 			len = 120.0f;
-			speed = 2.0f;
 		}
 
 		if (circle == 3)
 		{
 			len = 180.0f;
-			speed = 2.0f;
 		}
 
 		//â~é¸è„Çà⁄ìÆ
@@ -340,7 +355,7 @@ void GameScene::Update()
 			}
 
 			//âÊñ äOÇ…èoÇΩíeÇfalseÇ…Ç∑ÇÈ
-			if (pBullPos[i].x <= -200 || pBullPos[i].x >= 200 || pBullPos[i].z <= -200 || pBullPos[i].z >= 200)
+			if (pBullPos[i].x <= -1000 || pBullPos[i].x >= 1000 || pBullPos[i].z <= -1000 || pBullPos[i].z >= 1000)
 			{
 				pBullPos[i] = { 1000, 1000, 1000 };
 				pBulletObj[i]->SetPosition({ pBullPos[i] });
@@ -386,7 +401,7 @@ void GameScene::Update()
 			}
 
 			//âÊñ äOÇ…èoÇΩíeÇfalseÇ…Ç∑ÇÈ
-			if (eBullPos[i].x <= -200 || eBullPos[i].x >= 200 || eBullPos[i].z <= -200 || eBullPos[i].z >= 200)
+			if (eBullPos[i].x <= -1000 || eBullPos[i].x >= 1000 || eBullPos[i].z <= -1000 || eBullPos[i].z >= 1000)
 			{
 				eBullPos[i] = { 1000, 1000, 1000 };
 				eBulletObj[i]->SetPosition({ eBullPos[i] });
