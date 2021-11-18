@@ -39,6 +39,7 @@ void Camera::Update()
 	object3d->SetEye(eye);
 	object3d->SetTarget(target);
 
+
 	particleManager->SetEye({ eye.x, eye.y, eye.z});
 	particleManager->SetTarget(target);
 }

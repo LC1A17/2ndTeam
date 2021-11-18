@@ -5,13 +5,13 @@
 
 using namespace DirectX;
 
-//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 GameScene::GameScene()
 {
 
 }
 
-//ƒfƒXƒgƒ‰ƒNƒ^
+//ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 GameScene::~GameScene()
 {
 	safe_delete(sprite);
@@ -20,10 +20,10 @@ GameScene::~GameScene()
 	safe_delete(particleMan);
 }
 
-//‰Šú‰»ˆ—
+//åˆæœŸåŒ–å‡¦ç†
 void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 {
-	//nullptrƒ`ƒFƒbƒN
+	//nullptrãƒã‚§ãƒƒã‚¯
 	assert(dxCommon);
 	assert(input);
 	assert(audio);
@@ -32,16 +32,16 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	this->input = input;
 	this->audio = audio;
 
-	//ƒfƒoƒbƒOƒeƒLƒXƒg—pƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
+	//ãƒ‡ãƒãƒƒã‚°ãƒ†ã‚­ã‚¹ãƒˆç”¨ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
 	{
 		assert(0);
 	}
 
-	//ƒfƒoƒbƒOƒeƒLƒXƒg‰Šú‰»
+	//ãƒ‡ãƒãƒƒã‚°ãƒ†ã‚­ã‚¹ãƒˆåˆæœŸåŒ–
 	debugText.Initialize(debugTextTexNumber);
 
-	//ƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£èª­ã¿è¾¼ã¿
 	if (!Sprite::LoadTexture(2, L"Resources/title.png"))
 	{
 		assert(0);
@@ -57,7 +57,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		assert(0);
 	}
 
-	//”wŒiƒXƒvƒ‰ƒCƒg¶¬
+	//èƒŒæ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆç”Ÿæˆ
 	titleBack = Sprite::Create(2, { 0.0f,0.0f });
 	titleBack->SetSize({ WinApp::window_width, WinApp::window_height });
 	titleBack->SetPosition({ 0.0f,0.0f });
@@ -70,29 +70,29 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	endBack->SetSize({ WinApp::window_width, WinApp::window_height });
 	endBack->SetPosition({ 0.0f,0.0f });
 
-	//3DƒIƒuƒWƒFƒNƒg¶¬
+	//3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç”Ÿæˆ
 
-	//ƒx[ƒX
+	//ãƒ™ãƒ¼ã‚¹
 	modelFighter = modelFighter->CreateFromObject("base");
 	baseObj = Object3d::Create();
 	baseObj->SetModel(modelFighter);
 	baseObj->SetScale({ baseScale });
 
-	//ƒvƒŒƒCƒ„[
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
 	modelFighter = modelFighter->CreateFromObject("player");
 	playerObj = Object3d::Create();
 	playerObj->SetModel(modelFighter);
 	playerObj->SetPosition({ pPos });
 	playerObj->SetScale({ pScale });
 
-	//“G
+	//æ•µ
 	modelFighter = modelFighter->CreateFromObject("enemy");
 	enemyObj = Object3d::Create();
 	enemyObj->SetModel(modelFighter);
 	enemyObj->SetPosition({ ePos });
 	enemyObj->SetScale({ eScale });
 
-	//’e
+	//å¼¾
 	modelFighter = modelFighter->CreateFromObject("pBullet");
 
 	for (int i = 0; i < 255; i++)
@@ -104,23 +104,28 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		pBulletObj[i]->SetModel(modelFighter);
 		pBulletObj[i]->SetPosition({ pBullPos[i] });
 		pBulletObj[i]->SetScale({ pBullScale[i] });
+	}
 
+	modelFighter = modelFighter->CreateFromObject("eBullet");
+
+	for (int i = 0; i < 255; i++)
+	{
 		eBullPos[i] = { 1000, 1000, 1000 };
-		eBullScale[i] = { 10, 10, 10 };
+		eBullScale[i] = { 20, 20, 20 };
 		eBulletObj[i] = Object3d::Create();
 		eBulletObj[i]->SetModel(modelFighter);
 		eBulletObj[i]->SetPosition({ pBullPos[i] });
 		eBulletObj[i]->SetScale({ pBullScale[i] });
 	}
 
-	//•Ç
+	//å£
 	modelFighter = modelFighter->CreateFromObject("wall");
 
 	for (int i = 0; i < 30; i++)
 	{
 		wallPos[i] = { 1000, 1000, 1000 };
 		wallRota[i] = { 0, 0, 0 };
-		wallScale[i] = { 10, 10, 10 };
+		wallScale[i] = { 20, 10, 5 };
 		wallObj[i] = Object3d::Create();
 		wallObj[i]->SetModel(modelFighter);
 		wallObj[i]->SetPosition({ wallPos[i] });
@@ -128,9 +133,34 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		wallObj[i]->SetScale({ wallScale[i] });
 	}
 
+	wallPos[26] = { 0, 0, 155 };
+	wallPos[27] = { 0, 0, -155 };
+	wallPos[28] = { 155, 0, 0};
+	wallPos[29] = { -155, 0, 0};
+	wallRota[28] = { 0, 90, 0};
+	wallRota[29] = { 0, 90, 0 };
+	wallObj[26]->SetPosition({ wallPos[26] });
+	wallObj[27]->SetPosition({ wallPos[27] });
+	wallObj[28]->SetPosition({ wallPos[28] });
+	wallObj[29]->SetPosition({ wallPos[29] });
+	wallObj[28]->SetRotation({ wallRota[28] });
+	wallObj[29]->SetRotation({ wallRota[29] });
+	isWall[26] = true;
+	isWall[27] = true;
+	isWall[28] = true;
+	isWall[29] = true;
+
+	//è…•
+	modelFighter = modelFighter->CreateFromObject("enemyArm");
+	eArmObj = Object3d::Create();
+	eArmObj->SetModel(modelFighter);
+	eArmObj->SetPosition({ eArmPos });
+	eArmObj->SetRotation({ eArmRot });
+	eArmObj->SetScale({ eArmScale });
+
 	particleMan = ParticleManager::Create();
 
-	//ƒTƒEƒ“ƒhÄ¶
+	//ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿ
 	//audio->PlayWave("Resources/Alarm01.wav");
 
 	for (int i = 0; i < _countof(cameraMoveCount); i++)
@@ -141,7 +171,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	camera->Update();
 }
 
-//XVˆ—
+//æ›´æ–°å‡¦ç†
 void GameScene::Update()
 {
 	hoge.m128_f32[0] = circle;
@@ -150,10 +180,10 @@ void GameScene::Update()
 		<< std::fixed << std::setprecision(2)
 		<< hoge.m128_f32[0] << ")";
 
-	//1:ƒ^ƒCƒgƒ‹‰æ–Ê
+	//1:ã‚¿ã‚¤ãƒˆãƒ«ç”»é¢
 	if (sceneNum == Title)
 	{
-		//ƒXƒy[ƒX‚ğ‰Ÿ‚·‚ÆŠJn
+		//ã‚¹ãƒšãƒ¼ã‚¹ã‚’æŠ¼ã™ã¨é–‹å§‹
 		if (input->TriggerKey(DIK_SPACE))
 		{
 			sceneNum = Game;
@@ -162,39 +192,64 @@ void GameScene::Update()
 		debugText.Print("Title", 0, 0, 1.0f);
 	}
 
-	//2:ƒQ[ƒ€‰æ–Ê
+	//2:ã‚²ãƒ¼ãƒ ç”»é¢
 	else if (sceneNum == Game)
 	{
-		if (input->TriggerKey(DIK_1) && !cameraMoveCount[13] && i >= 1.0f)
+		rad = angle * 3.14f / 180.0f;
+
+		aroundX = cos(rad) * len / i;
+		aroundZ = sin(rad) * len / i;
+
+		pPos.x = posX + aroundX;
+		pPos.z = posZ + aroundZ;
+
+		if (!cameraMoveCount[13])
 		{
-			hit = true;
+			playerObj->SetPosition({ pPos });
+
+			fixedCamera.x = cos(rad) * len * 2.4f;
+			fixedCamera.y = fixed.y;
+			fixedCamera.z = sin(rad) * len * 2.4f;
+
+			camera->SetEye(fixedCamera);
 		}
 
-		//“ü—Íˆ—
-		//ƒfƒoƒbƒO—pBRƒL[‚ÅƒGƒ“ƒh
-		if (input->TriggerKey(DIK_R) && !cameraMoveCount[13])
+		if (hit)
 		{
-			sceneNum = End;
+			i -= 0.01f;
+			if (i <= 0.8f && hit)
+			{
+				hit = false;
+			}
+		}
+		else if (!hit && i <= 1.0f)
+		{
+			i += 0.05f;
 		}
 
-		//²‚ğˆÚ“®
-		if (input->TriggerKey(DIK_UP) && !cameraMoveCount[13])
+		//å…¥åŠ›å‡¦ç†
+		//è»¸ã‚’ç§»å‹•
+		if ((input->TriggerKey(DIK_UP) || input->PushPadStickUp()) && !cameraMoveCount[13] && !hit && !isDive)
 		{
-			//“à‘¤‚ÖˆÚ“®
-			//ˆê”Ô“à‘¤‚É‚¢‚È‚¢‚È‚çˆÚ“®
+			//å†…å´ã¸ç§»å‹•
+			//ä¸€ç•ªå†…å´ã«ã„ãªã„ãªã‚‰ç§»å‹•
 			if (circle > 1)
 			{
-				circle--;
+				direction = false;
+				isDive = true;
+				diveMove[0] = true;
 			}
 		}
 
-		else if (input->TriggerKey(DIK_DOWN) && !cameraMoveCount[13])
+		if ((input->TriggerKey(DIK_DOWN) || input->PushPadStickDown()) && !cameraMoveCount[13] && !hit && !isDive)
 		{
-			//ŠO‘¤‚ÖˆÚ“®
-			//ˆê”ÔŠO‘¤‚É‚¢‚È‚¢‚È‚çˆÚ“®
+			//å¤–å´ã¸ç§»å‹•
+			//ä¸€ç•ªå¤–å´ã«ã„ãªã„ãªã‚‰ç§»å‹•
 			if (circle < maxCircle)
 			{
-				circle++;
+				direction = true;
+				isDive = true;
+				diveMove[0] = true;
 			}
 		}
 
@@ -213,12 +268,12 @@ void GameScene::Update()
 			len = 180.0f;
 		}
 
-		//‰~üã‚ğˆÚ“®
-		if (input->PushPadStickLeft() && !cameraMoveCount[13])
+		//å††å‘¨ä¸Šã‚’ç§»å‹•
+		if ((input->PushKey(DIK_LEFT) || input->PushPadStickLeft()) && !cameraMoveCount[13] && !hit && !isDive)
 		{
-			//”½Œv‰ñ‚è‚ÉˆÚ“®
-			//LSHIFT‚ğ‰Ÿ‚µ‚Ä‚¢‚é‚Í‰Á‘¬
-			if (input->PushKey(DIK_LSHIFT))
+			//åæ™‚è¨ˆå›ã‚Šã«ç§»å‹•
+			//LSHIFTã‚’æŠ¼ã—ã¦ã„ã‚‹æ™‚ã¯åŠ é€Ÿ
+			if (input->PushKey(DIK_LSHIFT) || input->TriggerPadKey(BUTTON_LEFT_SHOULDER))
 			{
 				angle -= speed * accel;
 			}
@@ -229,11 +284,12 @@ void GameScene::Update()
 			}
 		}
 
-		if ((input->PushKey(DIK_LEFT) || input->PushPadStickRight()) && !cameraMoveCount[13])
+
+		if ((input->PushKey(DIK_RIGHT) || input->PushPadStickRight()) && !cameraMoveCount[13] && !hit && !isDive)
 		{
-			//Œv‰ñ‚è‚ÉˆÚ“®
-			//LSHIFT‚ğ‰Ÿ‚µ‚Ä‚¢‚é‚Í‰Á‘¬
-			if (input->PushKey(DIK_LSHIFT))
+			//æ™‚è¨ˆå›ã‚Šã«ç§»å‹•
+			//LSHIFTã‚’æŠ¼ã—ã¦ã„ã‚‹æ™‚ã¯åŠ é€Ÿ
+			if (input->PushKey(DIK_LSHIFT) || input->TriggerPadKey(BUTTON_LEFT_SHOULDER))
 			{
 				angle += speed * accel;
 			}
@@ -257,8 +313,6 @@ void GameScene::Update()
 		fixedCamera.y = fixed.y;
 		fixedCamera.z = sin(rad) * len * 2;
 
-		
-
 		if (!cameraMoveCount[13])
 		{
 			playerObj->SetBillboard(true);
@@ -268,18 +322,19 @@ void GameScene::Update()
 			camera->Update();
 		}
 
-		//’e‚ğ”­Ë
-		if (input->PushKey(DIK_SPACE) && !cameraMoveCount[13])
+		//å¼¾ã‚’ç™ºå°„
+		if ((input->PushKey(DIK_SPACE) || input->PushPadKey(BUTTON_RIGHT_SHOULDER)) && !cameraMoveCount[13] && !hit && !isDive)
 		{
 			if (pBullInterval >= 30)
 			{
-				//‰æ–Êã‚É‘¶İ‚µ‚È‚¢’e‚ğˆê‚Â‘I‚ñ‚Å©‹@‚ÌˆÊ’u‚ÉƒZƒbƒg
+				//ç”»é¢ä¸Šã«å­˜åœ¨ã—ãªã„å¼¾ã‚’ä¸€ã¤é¸ã‚“ã§è‡ªæ©Ÿã®ä½ç½®ã«ã‚»ãƒƒãƒˆ
 				for (int i = 0; i < 255; i++)
 				{
 					if (pBull[i] == false)
 					{
 						pOldPos[i] = pPos;
 						pBullPos[i] = pPos;
+						pBullPos[i].y += 20;
 						pBulletObj[i]->SetPosition({ pBullPos[i] });
 						pBullX[i] = ePos.x - pOldPos[i].x;
 						pBullY[i] = ePos.z - pOldPos[i].z;
@@ -294,44 +349,113 @@ void GameScene::Update()
 			}
 		}
 
-		//XVˆ—
-		pBullInterval++;
-		pDamageInterval++;
-		eDamageInterval++;
-		eAttackInterval++;
-
-		//•Ç‚Ì”
-		for (int i = 0; i < 30; i++)
+		if (!cameraMoveCount[13])
 		{
-			if (isWall[i] == true)
-			{
-				wallCount++;
-			}
-		}
+			//æ›´æ–°å‡¦ç†
+			pBullInterval++;
+			pDamageInterval++;
+			eDamageInterval++;
+			eAttackInterval++;
 
-		//ƒvƒŒƒCƒ„[‚Ì’e
-		for (int i = 0; i < 255; i++)
-		{
-			//’e‚Ì‹““®
-			if (pBull[i] == true)
+			//å£ã®æ•°
+			for (int i = 0; i < 25; i++)
 			{
-				pBullPos[i].x += pBullSpeedX[i];
-				pBullPos[i].z += pBullSpeedY[i];
-				pBulletObj[i]->SetPosition({ pBullPos[i] });
+				if (isWall[i] == true)
+				{
+					wallCount++;
+				}
 			}
 
-			/*//•Ç‚Æ‚Ì”»’è
-			if ( 1 )
+			//å£ã¨ã®åˆ¤å®š
+			if (hit)
 			{
-				pBullPos[i] = { 1000, 1000, 1000 };
-				bulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
+				for (int i = 0; i < 30; i++)
+				{
+					if (isWall[i] == true)
+					{
+						if (wallPos[i].x - 16 < pPos.x + 11.5 && pPos.x - 11.5 < wallPos[i].x + 16 && wallPos[i].z - 10.5 < pPos.z + 12 && pPos.z - 12 < wallPos[i].z + 10.5)
+						{
+							playerHP -= 5;
+							isWall[i] = false;
+						}
+					}
+				}
 			}
-			*/
 
-			//“G‚Æ‚Ì”»’è
-			if (eDamageInterval >= 50)
+			//æ½œã‚‹
+			if (isDive)
 			{
+				if (diveMove[0])
+				{
+					if (pPos.y >= -44)
+					{
+						pPos.y -= 4;
+					}
+
+					else
+					{
+						diveMove[0] = false;
+						diveMove[1] = true;
+					}
+				}
+
+				if (diveMove[1])
+				{
+					if (direction)
+					{
+						circle++;
+					}
+
+					else
+					{
+						circle--;
+					}
+
+					diveMove[1] = false;
+					diveMove[2] = true;
+				}
+
+				if (diveMove[2])
+				{
+					if (pPos.y <= 0)
+					{
+						pPos.y += 4;
+					}
+
+					else
+					{
+						diveMove[2] = false;
+						isDive = false;
+					}
+				}
+			}
+
+			//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¼¾
+			for (int i = 0; i < 255; i++)
+			{
+				//å¼¾ã®æŒ™å‹•
+				if (pBull[i] == true)
+				{
+					pBullPos[i].x += pBullSpeedX[i];
+					pBullPos[i].z += pBullSpeedY[i];
+					pBulletObj[i]->SetPosition({ pBullPos[i] });
+				}
+
+				//å£ã¨ã®åˆ¤å®š
+				for (int j = 0; j < 30; j++)
+				{
+					if (isWall[j] == true)
+					{
+						if (wallPos[j].x - 16 < pBullPos[i].x + 5 && pBullPos[i].x - 5 < wallPos[j].x + 16 && wallPos[j].z - 10.5 < pBullPos[i].z + 5 && pBullPos[i].z - 5 < wallPos[j].z + 10.5)
+						{
+							pBullPos[i] = { 1000, 1000, 1000 };
+							pBulletObj[i]->SetPosition({ pBullPos[i] });
+							pBull[i] = false;
+						}
+					}
+				}
+
+				//æ•µã¨ã®åˆ¤å®š
 				float a = pBullPos[i].x - ePos.x;
 				float b = pBullPos[i].z - ePos.z;
 				float c = sqrt(a * a + b * b);
@@ -344,136 +468,168 @@ void GameScene::Update()
 					pBull[i] = false;
 					eDamageInterval = 0;
 				}
-			}
 
-			//‰æ–ÊŠO‚Éo‚½’e‚ğfalse‚É‚·‚é
-			if (pBullPos[i].x <= -1000 || pBullPos[i].x >= 1000 || pBullPos[i].z <= -1000 || pBullPos[i].z >= 1000)
-			{
-				pBullPos[i] = { 1000, 1000, 1000 };
-				pBulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
-			}
-		}
-
-		//“G‚Ì’e
-		for (int i = 0; i < 255; i++)
-		{
-			//’e‚Ì‹““®
-			if (eBull[i] == true)
-			{
-				eBullPos[i].x += eBullSpeedX[i];
-				eBullPos[i].z += eBullSpeedY[i];
-				eBulletObj[i]->SetPosition({ eBullPos[i] });
-			}
-
-			/*//•Ç‚Æ‚Ì”»’è
-			if ( 1 )
-			{
-				pBullPos[i] = { 1000, 1000, 1000 };
-				bulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
-			}
-			*/
-
-			//ƒvƒŒƒCƒ„[‚Æ‚Ì”»’è
-			if (pDamageInterval >= 50)
-			{
-				float a = eBullPos[i].x - pPos.x;
-				float b = eBullPos[i].z - pPos.z;
-				float c = sqrt(a * a + b * b);
-
-				if (c <= 10)
+				//ç”»é¢å¤–ã«å‡ºãŸå¼¾ã‚’falseã«ã™ã‚‹
+				if (pBullPos[i].x <= -1000 || pBullPos[i].x >= 1000 || pBullPos[i].z <= -1000 || pBullPos[i].z >= 1000)
 				{
-					playerHP--;
-					eBullPos[i] = { 1000, 1000, 1000 };
-					eBulletObj[i]->SetPosition({ eBullPos[i] });
-					eBull[i] = false;
-					pDamageInterval = 0;
+					pBullPos[i] = { 1000, 1000, 1000 };
+					pBulletObj[i]->SetPosition({ pBullPos[i] });
+					pBull[i] = false;
 				}
 			}
 
-			//‰æ–ÊŠO‚Éo‚½’e‚ğfalse‚É‚·‚é
-			if (eBullPos[i].x <= -1000 || eBullPos[i].x >= 1000 || eBullPos[i].z <= -1000 || eBullPos[i].z >= 1000)
+			//æ•µã®å¼¾
+			for (int i = 0; i < 255; i++)
 			{
-				eBullPos[i] = { 1000, 1000, 1000 };
-				eBulletObj[i]->SetPosition({ eBullPos[i] });
-				eBull[i] = false;
-			}
-		}
-
-		//ƒ{ƒX‚Ì‹““®
-		if (eAttackInterval >= 50)
-		{
-			//ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ğQÆ
-			if (circle == 1)
-			{
-
-			}
-
-			else if (circle == 2)
-			{
-				if (wallCount <= 10)
+				//å¼¾ã®æŒ™å‹•
+				if (eBull[i] == true)
 				{
-					for (int i = 0; i < 30; i++)
+					eBullPos[i].x += eBullSpeedX[i];
+					eBullPos[i].z += eBullSpeedY[i];
+					eBulletObj[i]->SetPosition({ eBullPos[i] });
+				}
+
+				//å£ã¨ã®åˆ¤å®š
+				for (int j = 0; j < 30; j++)
+				{
+					if (isWall[j] == true)
 					{
-						if (isWall[i] == false)
+						if (wallPos[j].x - 16 < eBullPos[i].x + 5 && eBullPos[i].x - 5 < wallPos[j].x + 16 && wallPos[j].z - 10.5 < eBullPos[i].z + 5 && eBullPos[i].z - 5 < wallPos[j].z + 10.5)
 						{
-							wallPos[i] = { 30, 0, 0 };
-							isWall[i] = true;
-							wallObj[i]->SetPosition({ wallPos[i] });
+							eBullPos[i] = { 1000, 1000, 1000 };
+							eBulletObj[i]->SetPosition({ eBullPos[i] });
+							eBull[i] = false;
+						}
+					}
+				}
+
+				//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã¨ã®åˆ¤å®š
+				if (pDamageInterval >= 100 && isDive == false)
+				{
+					float a = eBullPos[i].x - pPos.x;
+					float b = eBullPos[i].z - pPos.z;
+					float c = sqrt(a * a + b * b);
+
+					if (c <= 10)
+					{
+						playerHP--;
+						eBullPos[i] = { 1000, 1000, 1000 };
+						eBulletObj[i]->SetPosition({ eBullPos[i] });
+						eBull[i] = false;
+						hit = true;
+						pDamageInterval = 0;
+					}
+				}
+
+				//ç”»é¢å¤–ã«å‡ºãŸå¼¾ã‚’falseã«ã™ã‚‹
+				if (eBullPos[i].x <= -1000 || eBullPos[i].x >= 1000 || eBullPos[i].z <= -1000 || eBullPos[i].z >= 1000)
+				{
+					eBullPos[i] = { 1000, 1000, 1000 };
+					eBulletObj[i]->SetPosition({ eBullPos[i] });
+					eBull[i] = false;
+				}
+			}
+
+			//è…•
+			if (eArm == true)
+			{
+				eArmCount++;
+
+				if (eArmPos.y >= -300)
+				{
+					eArmPos.y -= 16;
+					eArmObj->SetPosition({ eArmPos });
+				}
+
+				if (eArmCount >= 90)
+				{
+					eArmCount = 0;
+					eArm = false;
+				}
+			}
+
+			//ãƒœã‚¹ã®æŒ™å‹•
+			if (eAttackInterval >= 50)
+			{
+				//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½ç½®ã‚’å‚ç…§
+				if (circle == 1)
+				{
+					if (eArm == false)
+					{
+						eArmPos = pPos;
+						eArmPos.x += 120;
+						eArm = true;
+						eArmObj->SetPosition({ eArmPos });
+					}
+				}
+
+				else if (circle == 2)
+				{
+					if (wallCount < 1)
+					{
+						for (int i = 0; i < 30; i++)
+						{
+							if (isWall[i] == false)
+							{
+								wallPos[i] = pPos;
+								wallPos[i].z += 40;
+								isWall[i] = true;
+								wallObj[i]->SetPosition({ wallPos[i] });
+								break;
+							}
+						}
+					}
+				}
+
+				else if (circle == 3)
+				{
+					//ç”»é¢ä¸Šã«å­˜åœ¨ã—ãªã„å¼¾ã‚’ä¸€ã¤é¸ã‚“ã§æ•µã®ä½ç½®ã«ã‚»ãƒƒãƒˆ
+					for (int i = 0; i < 255; i++)
+					{
+						if (eBull[i] == false)
+						{
+							eBullPos[i] = ePos;
+							eBullPos[i].y += 20;
+							eBulletObj[i]->SetPosition({ eBullPos[i] });
+							eBullX[i] = pPos.x - ePos.x;
+							eBullY[i] = pPos.z - ePos.z;
+							eBullXY[i] = sqrt(eBullX[i] * eBullX[i] + eBullY[i] * eBullY[i]);
+							eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 10;
+							eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 10;
+							eBull[i] = true;
 							break;
 						}
 					}
 				}
-			}
 
-			else if (circle == 3)
-			{
-				//‰æ–Êã‚É‘¶İ‚µ‚È‚¢’e‚ğˆê‚Â‘I‚ñ‚Å“G‚ÌˆÊ’u‚ÉƒZƒbƒg
-				for (int i = 0; i < 255; i++)
+				else
 				{
-					if (eBull[i] == false)
-					{
-						eBullPos[i] = ePos;
-						eBulletObj[i]->SetPosition({ eBullPos[i] });
-						eBullX[i] = pPos.x - ePos.x;
-						eBullY[i] = pPos.z - ePos.z;
-						eBullXY[i] = sqrt(eBullX[i] * eBullX[i] + eBullY[i] * eBullY[i]);
-						eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 10;
-						eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 10;
-						eBull[i] = true;
-						break;
-					}
+
 				}
+
+				eAttackInterval = 0;
 			}
 
-			else
+			//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½“åŠ›ãŒ0ã«ãªã£ãŸã‚‰çµ‚äº†
+			if (playerHP <= 0)
 			{
-
+				sceneNum = End;
 			}
 
-			eAttackInterval = 0;
-		}
-
-		//ƒvƒŒƒCƒ„[‚Ì‘Ì—Í‚ª0‚É‚È‚Á‚½‚çI—¹
-		if (playerHP <= 0)
-		{
-			sceneNum = End;
-		}
-
-		//ƒ{ƒX‚Ì‘Ì—Í‚ª0‚É‚È‚Á‚½‚çI—¹
-		if (enemyHP <= 0)
-		{
-			sceneNum = End;
+			//ãƒœã‚¹ã®ä½“åŠ›ãŒ0ã«ãªã£ãŸã‚‰çµ‚äº†
+			if (enemyHP <= 0)
+			{
+				sceneNum = End;
+			}
 		}
 
 		debugText.Print("Game", 0, 0, 1.0f);
 	}
 
-	//3:ƒŠƒUƒ‹ƒg‰æ–Ê
+	//3:ãƒªã‚¶ãƒ«ãƒˆç”»é¢
 	else if (sceneNum == End)
 	{
-		//ƒXƒy[ƒX‚ğ‰Ÿ‚·‚Æƒ^ƒCƒgƒ‹‚É–ß‚é
+		//ã‚¹ãƒšãƒ¼ã‚¹ã‚’æŠ¼ã™ã¨ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹
 		if (input->TriggerKey(DIK_SPACE))
 		{
 			for (int i = 0; i < _countof(cameraMoveCount); i++)
@@ -492,16 +648,16 @@ void GameScene::Update()
 			}
 			
 			cameraMove = { 0, 80, 140 };
-			circle = 2;//ƒvƒŒƒCƒ„[‚Ì‚¢‚é‰~ü‚ÌˆÊ’uB1‚ªÅ’á’l‚Å”‚ª‘å‚«‚¢•û‚ªŠO‘¤
-			maxCircle = 3;//Œ»İ‚Ì‰~ü‚ÌÅ‘å”
-			playerHP = 100;//ƒvƒŒƒCƒ„[‚Ì‘Ì—Í
-			pPos = { 0, 0, 120 };//ƒvƒŒƒCƒ„[‚ÌÀ•W
-			pRot = { 0, 0, 0 };//ƒvƒŒƒCƒ„[‚ÌŒX‚«
+			circle = 2;//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã„ã‚‹å††å‘¨ã®ä½ç½®ã€‚1ãŒæœ€ä½å€¤ã§æ•°ãŒå¤§ãã„æ–¹ãŒå¤–å´
+			maxCircle = 3;//ç¾åœ¨ã®å††å‘¨ã®æœ€å¤§æ•°
+			playerHP = 100;//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½“åŠ›
+			pPos = { 0, 0, 120 };//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åº§æ¨™
+			pRot = { 0, 0, 0 };//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‚¾ã
 			pBullInterval = 30;
 			speed = 2.0f;
-			enemyHP = 10;//“G‚Ì‘Ì—Í
-			ePos = { 0, 0, 0 };//“G‚ÌÀ•W
-			eDamageInterval = 50;//“G‚Ì”í’e‚Ì–³“GŠÔ
+			enemyHP = 10;//æ•µã®ä½“åŠ›
+			ePos = { 0, 0, 0 };//æ•µã®åº§æ¨™
+			eDamageInterval = 50;//æ•µã®è¢«å¼¾æ™‚ã®ç„¡æ•µæ™‚é–“
 			angle = 90.0f;
 			len = 60.0f;
 			aroundX = 0.0f;
@@ -521,6 +677,7 @@ void GameScene::Update()
 	baseObj->Update();
 	playerObj->Update();
 	enemyObj->Update();
+	eArmObj->Update();
 
 	for (int i = 0; i < 255; i++)
 	{
@@ -542,69 +699,69 @@ void GameScene::Update()
 
 	for (int i = 0; i < 10; i++)
 	{
-		//X,Y,Z‘S‚Ä[-5.0,+5.0]‚Åƒ‰ƒ“ƒ_ƒ€‚É•ª•z
+		//X,Y,Zå…¨ã¦[-5.0,+5.0]ã§ãƒ©ãƒ³ãƒ€ãƒ ã«åˆ†å¸ƒ
 		const float md_pos = 10.0f;
 		XMFLOAT3 pos{};
 		pos.x = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.x;
 		pos.y = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.y;
 		pos.z = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.z;
-		//X,Y,Z‘S‚Ä[-0.05,+0.05]‚Åƒ‰ƒ“ƒ_ƒ€‚É•ª•z
+		//X,Y,Zå…¨ã¦[-0.05,+0.05]ã§ãƒ©ãƒ³ãƒ€ãƒ ã«åˆ†å¸ƒ
 		const float md_vel = 0.1f;
 		XMFLOAT3 vel{};
 		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
 		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
 		vel.z = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
-		//d—Í‚ÉŒ©—§‚Ä‚ÄY‚Ì‚İ[-0.001f,0]‚Åƒ‰ƒ“ƒ_ƒ€‚É•ª•z
+		//é‡åŠ›ã«è¦‹ç«‹ã¦ã¦Yã®ã¿[-0.001f,0]ã§ãƒ©ãƒ³ãƒ€ãƒ ã«åˆ†å¸ƒ
 		XMFLOAT3 acc{};
 		const float md_acc = 0.001f;
 		acc.y = -(float)rand() / RAND_MAX * md_acc;
-		//F‚ğƒ‰ƒ“ƒ_ƒ€‚É•ª•z
+		//è‰²ã‚’ãƒ©ãƒ³ãƒ€ãƒ ã«åˆ†å¸ƒ
 		XMFLOAT4 color;
 		color.w = 1;
 		color.x = (float)rand() / RAND_MAX * 1;
 		color.y = (float)rand() / RAND_MAX * 1;
 		color.z = (float)rand() / RAND_MAX * 1;
-		//’Ç‰Á
-		particleMan->Add(60, pos, vel, acc, 10.0f, 0.0f, color, {0,0,0,0});
+		//è¿½åŠ 
+		particleMan->Add(60, pos, vel, acc, 10.0f, 0.0f, color, { 0,0,0,0 });
 	}
 
 	particleMan->Update();
 }
 
-//•`‰æˆ—
+//æç”»å‡¦ç†
 void GameScene::Draw()
 {
-	ID3D12GraphicsCommandList* cmdList = dxCommon->GetCommandList();//ƒRƒ}ƒ“ƒhƒŠƒXƒg‚Ìæ“¾
+	ID3D12GraphicsCommandList* cmdList = dxCommon->GetCommandList();//ã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆã®å–å¾—
 
-#pragma region ”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+#pragma region èƒŒæ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 
-	Sprite::PreDraw(dxCommon->GetCommandList());//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ‘Oˆ—
+	Sprite::PreDraw(dxCommon->GetCommandList());//èƒŒæ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»å‰å‡¦ç†
 
 	if (sceneNum == Title)
 	{
-		titleBack->Draw();//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+		titleBack->Draw();//èƒŒæ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 	}
 
 	else if (sceneNum == Game)
 	{
-		gameBack->Draw();//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+		gameBack->Draw();//èƒŒæ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 	}
 
 	else if (sceneNum == End)
 	{
-		endBack->Draw();//”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+		endBack->Draw();//èƒŒæ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 	}
 
-	Sprite::PostDraw();//ƒXƒvƒ‰ƒCƒg•`‰æŒãˆ—
-	dxCommon->ClearDepthBuffer();//[“xƒoƒbƒtƒ@ƒNƒŠƒA
+	Sprite::PostDraw();//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»å¾Œå‡¦ç†
+	dxCommon->ClearDepthBuffer();//æ·±åº¦ãƒãƒƒãƒ•ã‚¡ã‚¯ãƒªã‚¢
 
-#pragma endregion ”wŒiƒXƒvƒ‰ƒCƒg•`‰æ
+#pragma endregion èƒŒæ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 
-#pragma region 3DƒIƒuƒWƒFƒNƒg•`‰æ
+#pragma region 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»
 
-	Object3d::PreDraw(dxCommon->GetCommandList());//3DƒIƒuƒWƒFƒNƒg•`‰æ‘Oˆ—
+	Object3d::PreDraw(dxCommon->GetCommandList());//3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»å‰å‡¦ç†
 
-	//3DƒIƒuƒWƒFƒNƒg‚Ì•`‰æ
+	//3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®æç”»
 	if (sceneNum == Title)
 	{
 
@@ -615,6 +772,11 @@ void GameScene::Draw()
 		baseObj->Draw();
 		playerObj->Draw();
 		enemyObj->Draw();
+
+		if (eArm == true)
+		{
+			eArmObj->Draw();
+		}
 
 		for (int i = 0; i < 255; i++)
 		{
@@ -644,25 +806,25 @@ void GameScene::Draw()
 	}
 
 	//object3d1->Draw();
-	Object3d::PostDraw();//3DƒIƒuƒWƒFƒNƒg•`‰æŒãˆ—
+	Object3d::PostDraw();//3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»å¾Œå‡¦ç†
 
-#pragma endregion 3DƒIƒuƒWƒFƒNƒg•`‰æ
+#pragma endregion 3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæç”»
 
-#pragma region ƒp[ƒeƒBƒNƒ‹
+#pragma region ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«
 
 	ParticleManager::PreDraw(dxCommon->GetCommandList());
 	particleMan->Draw();
 	ParticleManager::PostDraw();
 
-#pragma endregion ƒp[ƒeƒBƒNƒ‹
+#pragma endregion ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«
 
-#pragma region ‘OŒiƒXƒvƒ‰ƒCƒg•`‰æ
+#pragma region å‰æ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 
-	Sprite::PreDraw(dxCommon->GetCommandList());//‘OŒiƒXƒvƒ‰ƒCƒg•`‰æ‘Oˆ—
-	debugText.DrawAll(dxCommon->GetCommandList());//ƒfƒoƒbƒOƒeƒLƒXƒg‚Ì•`‰æ
-	Sprite::PostDraw();//ƒXƒvƒ‰ƒCƒg•`‰æŒãˆ—
+	Sprite::PreDraw(dxCommon->GetCommandList());//å‰æ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»å‰å‡¦ç†
+	debugText.DrawAll(dxCommon->GetCommandList());//ãƒ‡ãƒãƒƒã‚°ãƒ†ã‚­ã‚¹ãƒˆã®æç”»
+	Sprite::PostDraw();//ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»å¾Œå‡¦ç†
 
-#pragma endregion ‘OŒiƒXƒvƒ‰ƒCƒg•`‰æ
+#pragma endregion å‰æ™¯ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆæç”»
 }
 
 void GameScene::StartCameraMove()
