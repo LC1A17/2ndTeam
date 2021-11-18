@@ -165,25 +165,6 @@ void GameScene::Update()
 	//2:ゲーム画面
 	else if (sceneNum == Game)
 	{
-		rad = angle * 3.14f / 180.0f;
-
-		aroundX = cos(rad) * len / i;
-		aroundZ = sin(rad) * len / i;
-
-		pPos.x = posX + aroundX;
-		pPos.z = posZ + aroundZ;
-
-		if (!cameraMoveCount[13])
-		{
-			playerObj->SetPosition({ pPos });
-
-			fixedCamera.x = cos(rad) * len * 2.4f;
-			fixedCamera.y = fixed.y;
-			fixedCamera.z = sin(rad) * len * 2.4f;
-
-			camera->SetEye(fixedCamera);
-		}
-
 		if (input->TriggerKey(DIK_1) && !cameraMoveCount[13] && i >= 1.0f)
 		{
 			hit = true;
@@ -233,7 +214,7 @@ void GameScene::Update()
 		}
 
 		//円周上を移動
-		if (input->PushKey(DIK_LEFT) && !cameraMoveCount[13])
+		if (input->PushPadStickLeft() && !cameraMoveCount[13])
 		{
 			//反時計回りに移動
 			//LSHIFTを押している時は加速
@@ -248,7 +229,7 @@ void GameScene::Update()
 			}
 		}
 
-		if (input->PushKey(DIK_RIGHT) && !cameraMoveCount[13])
+		if ((input->PushKey(DIK_LEFT) || input->PushPadStickRight()) && !cameraMoveCount[13])
 		{
 			//時計回りに移動
 			//LSHIFTを押している時は加速
@@ -261,6 +242,30 @@ void GameScene::Update()
 			{
 				angle += speed;
 			}
+		}
+
+		rad = angle * 3.14159265359f / 180.0f;
+
+		aroundX = cos(rad) * len / i;
+		aroundZ = sin(rad) * len / i;
+
+		pPos = playerObj->GetPosition();
+
+		pPos.x = aroundX;
+		pPos.z = aroundZ;
+		fixedCamera.x = cos(rad) * len * 2;
+		fixedCamera.y = fixed.y;
+		fixedCamera.z = sin(rad) * len * 2;
+
+		
+
+		if (!cameraMoveCount[13])
+		{
+			playerObj->SetBillboard(true);
+			playerObj->SetRotation({ 0,180,0 });
+			playerObj->SetPosition(pPos);
+			camera->SetEye(fixedCamera);
+			camera->Update();
 		}
 
 		//弾を発射
@@ -535,15 +540,14 @@ void GameScene::Update()
 
 	camera->Update();
 
-	/*
 	for (int i = 0; i < 10; i++)
 	{
 		//X,Y,Z全て[-5.0,+5.0]でランダムに分布
 		const float md_pos = 10.0f;
 		XMFLOAT3 pos{};
-		pos.x = (float)rand() / RAND_MAX * md_pos - md_pos / 2.0f;
-		pos.y = (float)rand() / RAND_MAX * md_pos - md_pos / 2.0f;
-		pos.z = (float)rand() / RAND_MAX * md_pos - md_pos / 2.0f;
+		pos.x = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.x;
+		pos.y = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.y;
+		pos.z = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.z;
 		//X,Y,Z全て[-0.05,+0.05]でランダムに分布
 		const float md_vel = 0.1f;
 		XMFLOAT3 vel{};
@@ -561,11 +565,10 @@ void GameScene::Update()
 		color.y = (float)rand() / RAND_MAX * 1;
 		color.z = (float)rand() / RAND_MAX * 1;
 		//追加
-		particleMan->Add(60, pos, vel, acc, 1.0f, 0.0f, color);
+		particleMan->Add(60, pos, vel, acc, 10.0f, 0.0f, color, {0,0,0,0});
 	}
-	*/
 
-	//particleMan->Update();
+	particleMan->Update();
 }
 
 //描画処理
@@ -648,7 +651,7 @@ void GameScene::Draw()
 #pragma region パーティクル
 
 	ParticleManager::PreDraw(dxCommon->GetCommandList());
-	//particleMan->Draw();
+	particleMan->Draw();
 	ParticleManager::PostDraw();
 
 #pragma endregion パーティクル

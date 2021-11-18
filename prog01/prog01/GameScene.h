@@ -104,8 +104,6 @@ private: // ƒƒ“ƒo•Ï”
 	float eBullSpeedX[255], eBullSpeedY[255];//“G‚Ì’e‚Ì‹““®—p
 	float eBullX[255], eBullY[255], eBullXY[255];//“G‚Ì’e‚Ì‹““®—p
 
-	float posX = 0.0f;
-	float posZ = 0.0f;
 	float rad = 0.0f;
 	float angle = 90.0f;
 	float len = 60.0f;
@@ -119,7 +117,9 @@ private: // ƒƒ“ƒo•Ï”
 	XMFLOAT3 fixed = camera->GetEye();
 	XMVECTOR cameraMove = { 0, 80, 140 };
 	bool cameraMoveCount[14];
+	float cameraRad = 0.0f;
+	float cameraAngle = 90.0f;
 
-	float i = 1.0f;
+	float i =1.0f;
 	bool hit = false;
 };

@@ -6,6 +6,24 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
+enum PadKey
+{
+	BUTTON_A, // Aボタン
+	BUTTON_B, // Bボタン
+	BUTTON_X, // Xボタン
+	BUTTON_Y, // Yボタン
+	BUTTON_LEFT_SHOULDER, // LBボタン
+	BUTTON_RIGHT_SHOULDER, // RBボタン
+	BUTTON_START, // STARTボタン
+	BUTTON_BACK, // BACKボタン
+	BUTTON_LEFT_THUMB, // 左スティック押し込み
+	BUTTON_RIGHT_THUMB, // 右スティック押し込み
+	BUTTON_DPAD_UP, // デジタル方向ボタン上
+	BUTTON_DPAD_DOWN, // デジタル方向ボタン下
+	BUTTON_DPAD_LEFT, // デジタル方向ボタン左
+	BUTTON_DPAD_RIGHT // デジタル方向ボタン右
+};
+
 class Input
 {
 private:
@@ -13,23 +31,6 @@ private:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 public: // サブクラス
-	static enum PadKey
-	{
-		BUTTON_A, // Aボタン
-		BUTTON_B, // Bボタン
-		BUTTON_X, // Xボタン
-		BUTTON_Y, // Yボタン
-		BUTTON_LEFT_SHOULDER, // LBボタン
-		BUTTON_RIGHT_SHOULDER, // RBボタン
-		BUTTON_START, // STARTボタン
-		BUTTON_BACK, // BACKボタン
-		BUTTON_LEFT_THUMB, // 左スティック押し込み
-		BUTTON_RIGHT_THUMB, // 右スティック押し込み
-		BUTTON_DPAD_UP, // デジタル方向ボタン上
-		BUTTON_DPAD_DOWN, // デジタル方向ボタン下
-		BUTTON_DPAD_LEFT, // デジタル方向ボタン左
-		BUTTON_DPAD_RIGHT // デジタル方向ボタン右
-	};
 
 public: //メンバ関数
 	//初期化
