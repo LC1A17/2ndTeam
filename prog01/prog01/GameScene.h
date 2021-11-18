@@ -79,7 +79,7 @@ private: // メンバ変数
 	bool isWall[30] = { false };//壁が出ているか
 
 	int playerHP = 100;//プレイヤーの体力
-	XMFLOAT3 pPos = { 0, 0, 125 };//プレイヤーの座標
+	XMFLOAT3 pPos = { 0, 0, 120 };//プレイヤーの座標
 	XMFLOAT3 pRot = { 0, 0, 0 };//プレイヤーの傾き
 	XMFLOAT3 pScale = { 5, 5, 5 };//プレイヤーの大きさ
 	XMFLOAT3 pOldPos[255];//プレイヤーの座標
@@ -111,6 +111,10 @@ private: // メンバ変数
 	bool eArm = false;//腕の表示
 	int eArmCount = 0;//腕の動作用
 
+	bool isDive = false;//潜る
+	bool direction = false;//潜るときの進行方向
+	bool diveMove[3] = { false };//潜った後の移動
+
 	float posX = 0.0f;
 	float posZ = 0.0f;
 	float rad = 0.0f;
@@ -126,6 +130,8 @@ private: // メンバ変数
 	XMFLOAT3 fixed = camera->GetEye();
 	XMVECTOR cameraMove = { 0, 80, 140 };
 	bool cameraMoveCount[14];
+	float cameraRad = 0.0f;
+	float cameraAngle = 90.0f;
 
 	float i = 1.0f;
 	bool hit = false;

@@ -125,13 +125,30 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	{
 		wallPos[i] = { 1000, 1000, 1000 };
 		wallRota[i] = { 0, 0, 0 };
-		wallScale[i] = { 10, 10, 10 };
+		wallScale[i] = { 20, 10, 5 };
 		wallObj[i] = Object3d::Create();
 		wallObj[i]->SetModel(modelFighter);
 		wallObj[i]->SetPosition({ wallPos[i] });
 		wallObj[i]->SetRotation({ wallRota[i] });
 		wallObj[i]->SetScale({ wallScale[i] });
 	}
+
+	wallPos[26] = { 0, 0, 155 };
+	wallPos[27] = { 0, 0, -155 };
+	wallPos[28] = { 155, 0, 0};
+	wallPos[29] = { -155, 0, 0};
+	wallRota[28] = { 0, 90, 0};
+	wallRota[29] = { 0, 90, 0 };
+	wallObj[26]->SetPosition({ wallPos[26] });
+	wallObj[27]->SetPosition({ wallPos[27] });
+	wallObj[28]->SetPosition({ wallPos[28] });
+	wallObj[29]->SetPosition({ wallPos[29] });
+	wallObj[28]->SetRotation({ wallRota[28] });
+	wallObj[29]->SetRotation({ wallRota[29] });
+	isWall[26] = true;
+	isWall[27] = true;
+	isWall[28] = true;
+	isWall[29] = true;
 
 	//腕
 	modelFighter = modelFighter->CreateFromObject("enemyArm");
@@ -197,11 +214,6 @@ void GameScene::Update()
 			camera->SetEye(fixedCamera);
 		}
 
-		if (input->TriggerKey(DIK_1) && !cameraMoveCount[13] && i >= 1.0f)
-		{
-			hit = true;
-		}
-
 		if (hit)
 		{
 			i -= 0.01f;
@@ -216,30 +228,28 @@ void GameScene::Update()
 		}
 
 		//入力処理
-		//デバッグ用。Rキーでエンド
-		if (input->TriggerKey(DIK_R) && !cameraMoveCount[13])
-		{
-			sceneNum = End;
-		}
-
 		//軸を移動
-		if (input->TriggerKey(DIK_UP) && !cameraMoveCount[13])
+		if ((input->TriggerKey(DIK_UP) || input->PushPadStickUp()) && !cameraMoveCount[13] && !hit && !isDive)
 		{
 			//内側へ移動
 			//一番内側にいないなら移動
 			if (circle > 1)
 			{
-				circle--;
+				direction = false;
+				isDive = true;
+				diveMove[0] = true;
 			}
 		}
 
-		else if (input->TriggerKey(DIK_DOWN) && !cameraMoveCount[13])
+		if ((input->TriggerKey(DIK_DOWN) || input->PushPadStickDown()) && !cameraMoveCount[13] && !hit && !isDive)
 		{
 			//外側へ移動
 			//一番外側にいないなら移動
 			if (circle < maxCircle)
 			{
-				circle++;
+				direction = true;
+				isDive = true;
+				diveMove[0] = true;
 			}
 		}
 
@@ -259,11 +269,11 @@ void GameScene::Update()
 		}
 
 		//円周上を移動
-		if (input->PushKey(DIK_LEFT) && !cameraMoveCount[13])
+		if ((input->PushKey(DIK_LEFT) || input->PushPadStickLeft()) && !cameraMoveCount[13] && !hit && !isDive)
 		{
 			//反時計回りに移動
 			//LSHIFTを押している時は加速
-			if (input->PushKey(DIK_LSHIFT))
+			if (input->PushKey(DIK_LSHIFT) || input->TriggerPadKey(BUTTON_LEFT_SHOULDER))
 			{
 				angle -= speed * accel;
 			}
@@ -274,11 +284,11 @@ void GameScene::Update()
 			}
 		}
 
-		if (input->PushKey(DIK_RIGHT) && !cameraMoveCount[13])
+		if ((input->PushKey(DIK_RIGHT) || input->PushPadStickRight()) && !cameraMoveCount[13] && !hit && !isDive)
 		{
 			//時計回りに移動
 			//LSHIFTを押している時は加速
-			if (input->PushKey(DIK_LSHIFT))
+			if (input->PushKey(DIK_LSHIFT) || input->TriggerPadKey(BUTTON_LEFT_SHOULDER))
 			{
 				angle += speed * accel;
 			}
@@ -289,8 +299,32 @@ void GameScene::Update()
 			}
 		}
 
+		rad = angle * 3.14159265359f / 180.0f;
+
+		aroundX = cos(rad) * len / i;
+		aroundZ = sin(rad) * len / i;
+
+		pPos = playerObj->GetPosition();
+
+		pPos.x = aroundX;
+		pPos.z = aroundZ;
+		fixedCamera.x = cos(rad) * len * 2;
+		fixedCamera.y = fixed.y;
+		fixedCamera.z = sin(rad) * len * 2;
+
+
+
+		if (!cameraMoveCount[13])
+		{
+			playerObj->SetBillboard(true);
+			playerObj->SetRotation({ 0,180,0 });
+			playerObj->SetPosition(pPos);
+			camera->SetEye(fixedCamera);
+			camera->Update();
+		}
+
 		//弾を発射
-		if (input->PushKey(DIK_SPACE) && !cameraMoveCount[13])
+		if ((input->PushKey(DIK_SPACE) || input->PushPadKey(BUTTON_RIGHT_SHOULDER)) && !cameraMoveCount[13] && !hit && !isDive)
 		{
 			if (pBullInterval >= 30)
 			{
@@ -301,6 +335,7 @@ void GameScene::Update()
 					{
 						pOldPos[i] = pPos;
 						pBullPos[i] = pPos;
+						pBullPos[i].y += 20;
 						pBulletObj[i]->SetPosition({ pBullPos[i] });
 						pBullX[i] = ePos.x - pOldPos[i].x;
 						pBullY[i] = ePos.z - pOldPos[i].z;
@@ -315,44 +350,113 @@ void GameScene::Update()
 			}
 		}
 
-		//更新処理
-		pBullInterval++;
-		pDamageInterval++;
-		eDamageInterval++;
-		eAttackInterval++;
-
-		//壁の数
-		for (int i = 0; i < 30; i++)
+		if (!cameraMoveCount[13])
 		{
-			if (isWall[i] == true)
-			{
-				wallCount++;
-			}
-		}
+			//更新処理
+			pBullInterval++;
+			pDamageInterval++;
+			eDamageInterval++;
+			eAttackInterval++;
 
-		//プレイヤーの弾
-		for (int i = 0; i < 255; i++)
-		{
-			//弾の挙動
-			if (pBull[i] == true)
+			//壁の数
+			for (int i = 0; i < 25; i++)
 			{
-				pBullPos[i].x += pBullSpeedX[i];
-				pBullPos[i].z += pBullSpeedY[i];
-				pBulletObj[i]->SetPosition({ pBullPos[i] });
+				if (isWall[i] == true)
+				{
+					wallCount++;
+				}
 			}
 
-			/*//壁との判定
-			if ( 1 )
+			//壁との判定
+			if (hit)
 			{
-				pBullPos[i] = { 1000, 1000, 1000 };
-				bulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
+				for (int i = 0; i < 30; i++)
+				{
+					if (isWall[i] == true)
+					{
+						if (wallPos[i].x - 16 < pPos.x + 11.5 && pPos.x - 11.5 < wallPos[i].x + 16 && wallPos[i].z - 10.5 < pPos.z + 12 && pPos.z - 12 < wallPos[i].z + 10.5)
+						{
+							playerHP -= 5;
+							isWall[i] = false;
+						}
+					}
+				}
 			}
-			*/
 
-			//敵との判定
-			if (eDamageInterval >= 50)
+			//潜る
+			if (isDive)
 			{
+				if (diveMove[0])
+				{
+					if (pPos.y >= -44)
+					{
+						pPos.y -= 4;
+					}
+
+					else
+					{
+						diveMove[0] = false;
+						diveMove[1] = true;
+					}
+				}
+
+				if (diveMove[1])
+				{
+					if (direction)
+					{
+						circle++;
+					}
+
+					else
+					{
+						circle--;
+					}
+
+					diveMove[1] = false;
+					diveMove[2] = true;
+				}
+
+				if (diveMove[2])
+				{
+					if (pPos.y <= 0)
+					{
+						pPos.y += 4;
+					}
+
+					else
+					{
+						diveMove[2] = false;
+						isDive = false;
+					}
+				}
+			}
+
+			//プレイヤーの弾
+			for (int i = 0; i < 255; i++)
+			{
+				//弾の挙動
+				if (pBull[i] == true)
+				{
+					pBullPos[i].x += pBullSpeedX[i];
+					pBullPos[i].z += pBullSpeedY[i];
+					pBulletObj[i]->SetPosition({ pBullPos[i] });
+				}
+
+				//壁との判定
+				for (int j = 0; j < 30; j++)
+				{
+					if (isWall[j] == true)
+					{
+						if (wallPos[j].x - 16 < pBullPos[i].x + 5 && pBullPos[i].x - 5 < wallPos[j].x + 16 && wallPos[j].z - 10.5 < pBullPos[i].z + 5 && pBullPos[i].z - 5 < wallPos[j].z + 10.5)
+						{
+							pBullPos[i] = { 1000, 1000, 1000 };
+							pBulletObj[i]->SetPosition({ pBullPos[i] });
+							pBull[i] = false;
+						}
+					}
+				}
+
+				//敵との判定
 				float a = pBullPos[i].x - ePos.x;
 				float b = pBullPos[i].z - ePos.z;
 				float c = sqrt(a * a + b * b);
@@ -365,151 +469,159 @@ void GameScene::Update()
 					pBull[i] = false;
 					eDamageInterval = 0;
 				}
-			}
 
-			//画面外に出た弾をfalseにする
-			if (pBullPos[i].x <= -1000 || pBullPos[i].x >= 1000 || pBullPos[i].z <= -1000 || pBullPos[i].z >= 1000)
-			{
-				pBullPos[i] = { 1000, 1000, 1000 };
-				pBulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
-			}
-		}
-
-		//敵の弾
-		for (int i = 0; i < 255; i++)
-		{
-			//弾の挙動
-			if (eBull[i] == true)
-			{
-				eBullPos[i].x += eBullSpeedX[i];
-				eBullPos[i].z += eBullSpeedY[i];
-				eBulletObj[i]->SetPosition({ eBullPos[i] });
-			}
-
-			/*//壁との判定
-			if ( 1 )
-			{
-				pBullPos[i] = { 1000, 1000, 1000 };
-				bulletObj[i]->SetPosition({ pBullPos[i] });
-				pBull[i] = false;
-			}
-			*/
-
-			//プレイヤーとの判定
-			if (pDamageInterval >= 50)
-			{
-				float a = eBullPos[i].x - pPos.x;
-				float b = eBullPos[i].z - pPos.z;
-				float c = sqrt(a * a + b * b);
-
-				if (c <= 10)
+				//画面外に出た弾をfalseにする
+				if (pBullPos[i].x <= -1000 || pBullPos[i].x >= 1000 || pBullPos[i].z <= -1000 || pBullPos[i].z >= 1000)
 				{
-					playerHP--;
+					pBullPos[i] = { 1000, 1000, 1000 };
+					pBulletObj[i]->SetPosition({ pBullPos[i] });
+					pBull[i] = false;
+				}
+			}
+
+			//敵の弾
+			for (int i = 0; i < 255; i++)
+			{
+				//弾の挙動
+				if (eBull[i] == true)
+				{
+					eBullPos[i].x += eBullSpeedX[i];
+					eBullPos[i].z += eBullSpeedY[i];
+					eBulletObj[i]->SetPosition({ eBullPos[i] });
+				}
+
+				//壁との判定
+				for (int j = 0; j < 30; j++)
+				{
+					if (isWall[j] == true)
+					{
+						if (wallPos[j].x - 16 < eBullPos[i].x + 5 && eBullPos[i].x - 5 < wallPos[j].x + 16 && wallPos[j].z - 10.5 < eBullPos[i].z + 5 && eBullPos[i].z - 5 < wallPos[j].z + 10.5)
+						{
+							eBullPos[i] = { 1000, 1000, 1000 };
+							eBulletObj[i]->SetPosition({ eBullPos[i] });
+							eBull[i] = false;
+						}
+					}
+				}
+
+				//プレイヤーとの判定
+				if (pDamageInterval >= 100 && isDive == false)
+				{
+					float a = eBullPos[i].x - pPos.x;
+					float b = eBullPos[i].z - pPos.z;
+					float c = sqrt(a * a + b * b);
+
+					if (c <= 10)
+					{
+						playerHP--;
+						eBullPos[i] = { 1000, 1000, 1000 };
+						eBulletObj[i]->SetPosition({ eBullPos[i] });
+						eBull[i] = false;
+						hit = true;
+						pDamageInterval = 0;
+					}
+				}
+
+				//画面外に出た弾をfalseにする
+				if (eBullPos[i].x <= -1000 || eBullPos[i].x >= 1000 || eBullPos[i].z <= -1000 || eBullPos[i].z >= 1000)
+				{
 					eBullPos[i] = { 1000, 1000, 1000 };
 					eBulletObj[i]->SetPosition({ eBullPos[i] });
 					eBull[i] = false;
-					pDamageInterval = 0;
 				}
 			}
 
-			//画面外に出た弾をfalseにする
-			if (eBullPos[i].x <= -1000 || eBullPos[i].x >= 1000 || eBullPos[i].z <= -1000 || eBullPos[i].z >= 1000)
+			//腕
+			if (eArm == true)
 			{
-				eBullPos[i] = { 1000, 1000, 1000 };
-				eBulletObj[i]->SetPosition({ eBullPos[i] });
-				eBull[i] = false;
-			}
-		}
+				eArmCount++;
 
-		//腕
-		if (eArm == true)
-		{
-			eArmCount++;
-
-			if (eArmPos.y >= -300)
-			{
-				eArmPos.y -= 16;
-				eArmObj->SetPosition({ eArmPos });
-			}
-
-			if (eArmCount >= 90)
-			{
-				eArmCount = 0;
-				eArm = false;
-			}
-		}
-
-		//ボスの挙動
-		if (eAttackInterval >= 50)
-		{
-			//プレイヤーの位置を参照
-			if (circle == 1)
-			{
-				if (eArm == false)
+				if (eArmPos.y >= -300)
 				{
-					eArmPos = pPos;
-					eArmPos.x += 120;
-					eArm = true;
+					eArmPos.y -= 16;
 					eArmObj->SetPosition({ eArmPos });
 				}
+
+				if (eArmCount >= 90)
+				{
+					eArmCount = 0;
+					eArm = false;
+				}
 			}
 
-			else if (circle == 2)
+			//ボスの挙動
+			if (eAttackInterval >= 50)
 			{
-				if (wallCount <= 10)
+				//プレイヤーの位置を参照
+				if (circle == 1)
 				{
-					for (int i = 0; i < 30; i++)
+					if (eArm == false)
 					{
-						if (isWall[i] == false)
+						eArmPos = pPos;
+						eArmPos.x += 120;
+						eArm = true;
+						eArmObj->SetPosition({ eArmPos });
+					}
+				}
+
+				else if (circle == 2)
+				{
+					if (wallCount < 1)
+					{
+						for (int i = 0; i < 30; i++)
 						{
-							wallPos[i] = { 30, 0, 0 };
-							isWall[i] = true;
-							wallObj[i]->SetPosition({ wallPos[i] });
+							if (isWall[i] == false)
+							{
+								wallPos[i] = pPos;
+								wallPos[i].z += 40;
+								isWall[i] = true;
+								wallObj[i]->SetPosition({ wallPos[i] });
+								break;
+							}
+						}
+					}
+				}
+
+				else if (circle == 3)
+				{
+					//画面上に存在しない弾を一つ選んで敵の位置にセット
+					for (int i = 0; i < 255; i++)
+					{
+						if (eBull[i] == false)
+						{
+							eBullPos[i] = ePos;
+							eBullPos[i].y += 20;
+							eBulletObj[i]->SetPosition({ eBullPos[i] });
+							eBullX[i] = pPos.x - ePos.x;
+							eBullY[i] = pPos.z - ePos.z;
+							eBullXY[i] = sqrt(eBullX[i] * eBullX[i] + eBullY[i] * eBullY[i]);
+							eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 10;
+							eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 10;
+							eBull[i] = true;
 							break;
 						}
 					}
 				}
-			}
 
-			else if (circle == 3)
-			{
-				//画面上に存在しない弾を一つ選んで敵の位置にセット
-				for (int i = 0; i < 255; i++)
+				else
 				{
-					if (eBull[i] == false)
-					{
-						eBullPos[i] = ePos;
-						eBulletObj[i]->SetPosition({ eBullPos[i] });
-						eBullX[i] = pPos.x - ePos.x;
-						eBullY[i] = pPos.z - ePos.z;
-						eBullXY[i] = sqrt(eBullX[i] * eBullX[i] + eBullY[i] * eBullY[i]);
-						eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 10;
-						eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 10;
-						eBull[i] = true;
-						break;
-					}
+
 				}
+
+				eAttackInterval = 0;
 			}
 
-			else
+			//プレイヤーの体力が0になったら終了
+			if (playerHP <= 0)
 			{
-
+				sceneNum = End;
 			}
 
-			eAttackInterval = 0;
-		}
-
-		//プレイヤーの体力が0になったら終了
-		if (playerHP <= 0)
-		{
-			sceneNum = End;
-		}
-
-		//ボスの体力が0になったら終了
-		if (enemyHP <= 0)
-		{
-			sceneNum = End;
+			//ボスの体力が0になったら終了
+			if (enemyHP <= 0)
+			{
+				sceneNum = End;
+			}
 		}
 
 		debugText.Print("Game", 0, 0, 1.0f);
@@ -586,15 +698,14 @@ void GameScene::Update()
 
 	camera->Update();
 
-	/*
 	for (int i = 0; i < 10; i++)
 	{
 		//X,Y,Z全て[-5.0,+5.0]でランダムに分布
 		const float md_pos = 10.0f;
 		XMFLOAT3 pos{};
-		pos.x = (float)rand() / RAND_MAX * md_pos - md_pos / 2.0f;
-		pos.y = (float)rand() / RAND_MAX * md_pos - md_pos / 2.0f;
-		pos.z = (float)rand() / RAND_MAX * md_pos - md_pos / 2.0f;
+		pos.x = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.x;
+		pos.y = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.y;
+		pos.z = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f) + pPos.z;
 		//X,Y,Z全て[-0.05,+0.05]でランダムに分布
 		const float md_vel = 0.1f;
 		XMFLOAT3 vel{};
@@ -612,11 +723,10 @@ void GameScene::Update()
 		color.y = (float)rand() / RAND_MAX * 1;
 		color.z = (float)rand() / RAND_MAX * 1;
 		//追加
-		particleMan->Add(60, pos, vel, acc, 1.0f, 0.0f, color);
+		particleMan->Add(60, pos, vel, acc, 10.0f, 0.0f, color, { 0,0,0,0 });
 	}
-	*/
 
-	//particleMan->Update();
+	particleMan->Update();
 }
 
 //描画処理
@@ -704,7 +814,7 @@ void GameScene::Draw()
 #pragma region パーティクル
 
 	ParticleManager::PreDraw(dxCommon->GetCommandList());
-	//particleMan->Draw();
+	particleMan->Draw();
 	ParticleManager::PostDraw();
 
 #pragma endregion パーティクル

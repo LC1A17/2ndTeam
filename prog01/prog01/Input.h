@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <Windows.h>
 #include <wrl.h>
@@ -6,74 +6,75 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
+enum PadKey
+{
+	BUTTON_A, // Aãƒœã‚¿ãƒ³
+	BUTTON_B, // Bãƒœã‚¿ãƒ³
+	BUTTON_X, // Xãƒœã‚¿ãƒ³
+	BUTTON_Y, // Yãƒœã‚¿ãƒ³
+	BUTTON_LEFT_SHOULDER, // LBãƒœã‚¿ãƒ³
+	BUTTON_RIGHT_SHOULDER, // RBãƒœã‚¿ãƒ³
+	BUTTON_START, // STARTãƒœã‚¿ãƒ³
+	BUTTON_BACK, // BACKãƒœã‚¿ãƒ³
+	BUTTON_LEFT_THUMB, // å·¦ã‚¹ãƒ†ã‚£ãƒƒã‚¯æŠ¼ã—è¾¼ã¿
+	BUTTON_RIGHT_THUMB, // å³ã‚¹ãƒ†ã‚£ãƒƒã‚¯æŠ¼ã—è¾¼ã¿
+	BUTTON_DPAD_UP, // ãƒ‡ã‚¸ã‚¿ãƒ«æ–¹å‘ãƒœã‚¿ãƒ³ä¸Š
+	BUTTON_DPAD_DOWN, // ãƒ‡ã‚¸ã‚¿ãƒ«æ–¹å‘ãƒœã‚¿ãƒ³ä¸‹
+	BUTTON_DPAD_LEFT, // ãƒ‡ã‚¸ã‚¿ãƒ«æ–¹å‘ãƒœã‚¿ãƒ³å·¦
+	BUTTON_DPAD_RIGHT // ãƒ‡ã‚¸ã‚¿ãƒ«æ–¹å‘ãƒœã‚¿ãƒ³å³
+};
+
 class Input
 {
 private:
-	//namespaceÈ—ª
+	//namespaceçœç•¥
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-public: // ƒTƒuƒNƒ‰ƒX
-	static enum PadKey
-	{
-		BUTTON_A, // Aƒ{ƒ^ƒ“
-		BUTTON_B, // Bƒ{ƒ^ƒ“
-		BUTTON_X, // Xƒ{ƒ^ƒ“
-		BUTTON_Y, // Yƒ{ƒ^ƒ“
-		BUTTON_LEFT_SHOULDER, // LBƒ{ƒ^ƒ“
-		BUTTON_RIGHT_SHOULDER, // RBƒ{ƒ^ƒ“
-		BUTTON_START, // STARTƒ{ƒ^ƒ“
-		BUTTON_BACK, // BACKƒ{ƒ^ƒ“
-		BUTTON_LEFT_THUMB, // ¶ƒXƒeƒBƒbƒN‰Ÿ‚µž‚Ý
-		BUTTON_RIGHT_THUMB, // ‰EƒXƒeƒBƒbƒN‰Ÿ‚µž‚Ý
-		BUTTON_DPAD_UP, // ƒfƒWƒ^ƒ‹•ûŒüƒ{ƒ^ƒ“ã
-		BUTTON_DPAD_DOWN, // ƒfƒWƒ^ƒ‹•ûŒüƒ{ƒ^ƒ“‰º
-		BUTTON_DPAD_LEFT, // ƒfƒWƒ^ƒ‹•ûŒüƒ{ƒ^ƒ“¶
-		BUTTON_DPAD_RIGHT // ƒfƒWƒ^ƒ‹•ûŒüƒ{ƒ^ƒ“‰E
-	};
+public: // ã‚µãƒ–ã‚¯ãƒ©ã‚¹
 
-public: //ƒƒ“ƒoŠÖ”
-	//‰Šú‰»
+public: //ãƒ¡ãƒ³ãƒé–¢æ•°
+	//åˆæœŸåŒ–
 	bool Initialize(HINSTANCE hInstance, HWND hwnd);
-	//XV
+	//æ›´æ–°
 	void Update();
-	// ƒL[‚Ì‰Ÿ‰º‚ðƒ`ƒFƒbƒN
+	// ã‚­ãƒ¼ã®æŠ¼ä¸‹ã‚’ãƒã‚§ãƒƒã‚¯
 	bool PushKey(BYTE keyNumber);
-	// ƒL[‚ÌƒgƒŠƒK[‚ðƒ`ƒFƒbƒN
+	// ã‚­ãƒ¼ã®ãƒˆãƒªã‚¬ãƒ¼ã‚’ãƒã‚§ãƒƒã‚¯
 	bool TriggerKey(BYTE keyNumber);
 
 	static BOOL CALLBACK DeviceFindCallBack(LPCDIDEVICEINSTANCE ipddi, LPVOID pvRef);
 
-	//ƒQ[ƒ€ƒpƒbƒh‚ÌƒXƒeƒBƒbƒN
+	//ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã®ã‚¹ãƒ†ã‚£ãƒƒã‚¯
 	bool PushPadStickUp();
 	bool PushPadStickDown();
 	bool PushPadStickRight();
 	bool PushPadStickLeft();
 
-	//ƒQ[ƒ€ƒpƒbƒh‚ÌƒL[‚Ì‰Ÿ‰º‚ðƒ`ƒFƒbƒN
+	//ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰ã®ã‚­ãƒ¼ã®æŠ¼ä¸‹ã‚’ãƒã‚§ãƒƒã‚¯
 	bool PushPadKey(PadKey keyNumber);
-	// ƒL[‚ÌƒgƒŠƒK[‚ðƒ`ƒFƒbƒN
+	// ã‚­ãƒ¼ã®ãƒˆãƒªã‚¬ãƒ¼ã‚’ãƒã‚§ãƒƒã‚¯
 	bool TriggerPadKey(PadKey keyNumber);
 
-private: //ƒƒ“ƒo•Ï”
-	//ƒL[ƒ{[ƒh
+private: //ãƒ¡ãƒ³ãƒå¤‰æ•°
+	//ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰
 	ComPtr<IDirectInput8> dinput;
 	ComPtr<IDirectInputDevice8> devkeyboard;
 	BYTE key[256] = {};
 	BYTE keyPre[256] = {};
 
-	//ƒQ[ƒ€ƒpƒbƒh
+	//ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰
 	ComPtr<IDirectInput8> dinputPad;
 	ComPtr<IDirectInputDevice8> devGamePad;
 	LPVOID parameter;
-	// Ž²ƒ‚[ƒh‚ðâ‘Î’lƒ‚[ƒh‚Æ‚µ‚ÄÝ’è
+	// è»¸ãƒ¢ãƒ¼ãƒ‰ã‚’çµ¶å¯¾å€¤ãƒ¢ãƒ¼ãƒ‰ã¨ã—ã¦è¨­å®š
 	DIPROPDWORD diprop;
-	// ’l‚Ì”ÍˆÍÝ’è
+	// å€¤ã®ç¯„å›²è¨­å®š
 	DIPROPRANGE diprg;
-	// –³”½‰ž”ÍˆÍ
+	// ç„¡åå¿œç¯„å›²
 	float angle = 200;
-	// “ü—Íî•ñ
+	// å…¥åŠ›æƒ…å ±
 	DIJOYSTATE padData;
 	DIJOYSTATE padDataPre;
-	//Ú‘±Šm”F
+	//æŽ¥ç¶šç¢ºèª
 	bool padFlag = true;
 };
