@@ -43,6 +43,8 @@ public: // サブクラス
 
 		//座標
 		XMFLOAT3 position = {};
+		//座標
+		XMFLOAT3 s_position = {};
 		//速度
 		XMFLOAT3 velocity = {};
 		//加速度
@@ -152,6 +154,8 @@ public: // メンバ関数
 	bool Initialize();
 	// 毎フレーム処理
 	void Update();
+	// 毎フレーム処理
+	void EaseInUpdate(XMFLOAT3 end);
 	// 描画
 	void Draw();
 	//パーティクルの追加
