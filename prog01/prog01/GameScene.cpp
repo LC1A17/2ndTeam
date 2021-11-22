@@ -17,7 +17,7 @@ GameScene::~GameScene()
 	safe_delete(sprite);
 	safe_delete(baseObj);
 	safe_delete(modelFighter);
-	safe_delete(particleMan);
+	safe_delete(playerParticleMan);
 }
 
 //初期化処理
@@ -158,7 +158,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	eArmObj->SetRotation({ eArmRot });
 	eArmObj->SetScale({ eArmScale });
 
-	particleMan = ParticleManager::Create();
+	playerParticleMan = ParticleManager::Create();
+	enemyParticleMan = ParticleManager::Create();
 
 	//サウンド再生
 	//audio->PlayWave("Resources/Alarm01.wav");
@@ -722,10 +723,41 @@ void GameScene::Update()
 		color.y = (float)rand() / RAND_MAX * 1;
 		color.z = (float)rand() / RAND_MAX * 1;
 		//追加
-		particleMan->Add(60, pos, vel, acc, 10.0f, 0.0f, color, { 0,0,0,0 });
+		playerParticleMan->Add(60, pos, vel, acc, 10.0f, 0.0f, color, { 0,0,0,0 });
 	}
+	playerParticleMan->Update();
+	enemyParticleMan->EaseInUpdate(ePos);
 
-	particleMan->Update();
+	for (int i = 0; i < 1; i++)
+	{
+		//X,Y,Z全て[-5.0,+5.0]でランダムに分布
+		const float md_pos = 10.0f;
+		//敵のパーティクルの発生範囲
+		XMFLOAT3 ePos{};
+		ePos.x = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f);
+		ePos.y = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f);
+		ePos.z = ((float)rand() / RAND_MAX * md_pos - md_pos / 2.0f);
+		//X,Y,Z全て[-0.05,+0.05]でランダムに分布
+		const float md_vel = 0.1f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		//重力に見立ててYのみ[-0.001f,0]でランダムに分布
+		XMFLOAT3 acc{};
+		const float md_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * md_acc;
+		//色をランダムに分布
+		XMFLOAT4 color;
+		color.w = 1;
+		color.x = (float)rand() / RAND_MAX * 1;
+		color.y = (float)rand() / RAND_MAX * 1;
+		color.z = (float)rand() / RAND_MAX * 1;
+		//追加
+		enemyParticleMan->Add(60, ePos, vel, acc, 10.0f, 0.0f, color, { 0,0,0,0 });
+	}
+	playerParticleMan->Update();
+	enemyParticleMan->EaseInUpdate(ePos);
 }
 
 //描画処理
@@ -813,7 +845,8 @@ void GameScene::Draw()
 #pragma region パーティクル
 
 	ParticleManager::PreDraw(dxCommon->GetCommandList());
-	particleMan->Draw();
+	playerParticleMan->Draw();
+	enemyParticleMan->Draw();
 	ParticleManager::PostDraw();
 
 #pragma endregion パーティクル

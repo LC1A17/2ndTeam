@@ -63,7 +63,8 @@ private: // メンバ変数
 	Object3d* eBulletObj[255] = { nullptr };//弾
 	Object3d* wallObj[30] = { nullptr };//弾
 
-	ParticleManager* particleMan = nullptr;
+	ParticleManager* playerParticleMan = nullptr;
+	ParticleManager* enemyParticleMan = nullptr;
 
 	Model* modelFighter1 = nullptr;
 

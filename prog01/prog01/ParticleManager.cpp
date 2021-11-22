@@ -677,6 +677,76 @@ void ParticleManager::Update()
 	constBuff->Unmap(0, nullptr);
 }
 
+void ParticleManager::EaseInUpdate(XMFLOAT3 end)
+{
+	HRESULT result;
+
+	//寿命が尽きたパーティクルを全削除
+	particles.remove_if
+	(
+		[](Particle& x)
+		{
+			return x.frame >= x.num_frame;
+		}
+	);
+
+	//全パーティクル更新
+	for (std::forward_list<Particle>::iterator it = particles.begin();
+		it != particles.end();
+		it++)
+	{
+		//経過フレーム数をカウント
+		it->frame++;
+		//進行度を0～1の範囲に換算
+		float f = (float)it->num_frame / it->frame;
+		//速度による移動
+		it->position.x = (end.x - it->s_position.x) * f * f + it->s_position.x;
+		it->position.y = (end.y - it->s_position.y) * f * f + it->s_position.y;
+		it->position.z = (end.z - it->s_position.z) * f * f + it->s_position.z;
+		//進行度を0～1の範囲に換算
+		f = (float)it->num_frame / it->frame;
+		//スケールの線形補間
+		it->scale = (it->e_scale - it->s_scale) / f;
+		it->scale += it->s_scale;
+		//色
+		it->color.x = (it->e_color.x - it->s_color.x) / f;
+		it->color.x += it->s_color.x;
+		it->color.y = (it->e_color.y - it->s_color.y) / f;
+		it->color.y += it->s_color.y;
+		it->color.z = (it->e_color.z - it->s_color.z) / f;
+		it->color.z += it->s_color.z;
+	}
+
+	//頂点バッファへデータ転送
+	VertexPos* vertMap = nullptr;
+	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
+	if (SUCCEEDED(result))
+	{
+		//パーティクルの情報を1つずつ反映
+		for (std::forward_list<Particle>::iterator it = particles.begin();
+			it != particles.end();
+			it++)
+		{
+			//座標
+			vertMap->pos = it->position;
+			//スケール
+			vertMap->scale = it->scale;
+			//色
+			vertMap->color = it->color;
+			//次の頂点へ
+			vertMap++;
+		}
+		vertBuff->Unmap(0, nullptr);
+	}
+
+	// 定数バッファへデータ転送
+	ConstBufferData* constMap = nullptr;
+	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	constMap->mat = matView * matProjection; //行列の合成
+	constMap->matBillboard = matBillboard;
+	constBuff->Unmap(0, nullptr);
+}
+
 void ParticleManager::Draw()
 {
 	// nullptrチェック
@@ -707,6 +777,7 @@ void ParticleManager::Add(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOA
 	Particle& p = particles.front();
 	//値のセット
 	p.position = position;
+	p.s_position = position;
 	p.velocity = velocity;
 	p.accel = accel;
 	p.num_frame = life;
