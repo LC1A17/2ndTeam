@@ -73,13 +73,16 @@ private: // メンバ変数
 	Sprite* num7[6] = { nullptr };
 	Sprite* num8[6] = { nullptr };
 	Sprite* num9[6] = { nullptr };
+	Sprite* rankS = nullptr;
+	Sprite* rankA = nullptr;
+	Sprite* rankB = nullptr;
 	Model* modelFighter = nullptr;
 
 	Object3d* baseObj = nullptr;//フィールド
 	Object3d* playerObj = nullptr;//プレイヤー
 	Object3d* enemyObj = nullptr;//エネミー
 	Object3d* eAtkObj = nullptr;//エネミー
-	Object3d* eArmObj = nullptr;//エネミーの腕
+	Object3d* eArmObj[5] = { nullptr };//エネミーの腕
 	Object3d* pBulletObj[255] = { nullptr };//弾
 	Object3d* eBulletObj[255] = { nullptr };//弾
 	Object3d* eBulletObj2[255] = { nullptr };//弾
@@ -101,10 +104,11 @@ private: // メンバ変数
 	XMFLOAT3 wallRota[24];//壁の向き
 	XMFLOAT3 wallScale[24];//壁のスケール
 	bool isWall[24] = { false };//壁が出ているか
-	int wallHP[24] = { 10 };
+	int wallHP[24] = { 5 };
+	int pillarCount[5] = { 0 };
 
-	float playerHP = 10;//プレイヤーの体力
-	float maxPlayerHP = 10;//プレイヤーの最大体力
+	float playerHP = 20;//プレイヤーの体力
+	float maxPlayerHP = 20;//プレイヤーの最大体力
 	XMFLOAT3 pPos = { 0, 0, 120 };//プレイヤーの座標
 	XMFLOAT3 pRot = { 0, 0, 0 };//プレイヤーの傾き
 	XMFLOAT3 pScale = { 5, 5, 5 };//プレイヤーの大きさ
@@ -186,7 +190,11 @@ private: // メンバ変数
 	bool isBarrier = true;//ダメージレーン使用可能か
 	bool isAttack = true;//攻撃が終わったか
 	bool laserAttack = false;//レーザー発動中か
-	int laserCount = 0;//レーザーの時間
+	bool barrierAttack = false;
+	int laserCount = 0;//レーザーの時間(回転前)
+	int laserCount2 = 0;//レーザーの時間(回転後)
+	int barrierCount = 0;//レーザーの時間(回転前)
+	int barrierCount2 = 0;//レーザーの時間(回転後)
 	bool wallCreate = false;//壁生成中か
 	bool isArm = false;//腕攻撃中か
 	bool eArm[5] = { false };//腕の表示
@@ -202,5 +210,11 @@ private: // メンバ変数
 	bool isSound[4] = { false };
 	int SoundCount[4] = { 0 };
 
-	bool isEnemyAtk = true;
+	bool isEnemyAtk = false;
+	float laserStart = 0;
+	float laserDirection = 0;
+
+	int rank = 0;//0がBで2がS
+
+	bool powerFlag = false;//必殺技エフェクト
 };

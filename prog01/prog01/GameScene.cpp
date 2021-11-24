@@ -158,6 +158,21 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 		assert(0);
 	}
 
+	if (!Sprite::LoadTexture(23, L"Resources/rankS.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(24, L"Resources/rankA.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(25, L"Resources/rankB.png"))
+	{
+		assert(0);
+	}
+
 	//背景スプライト生成
 	gamestart = Sprite::Create(1, { 0.0f,0.0f });
 	gamestart->SetSize({ 830, 46 });
@@ -250,6 +265,18 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 		num9[i]->SetPosition({ 0.0f,0.0f });
 	}
 
+	rankS = Sprite::Create(23, { 0.0f,0.0f });
+	rankS->SetSize({ 467, 83 });
+	rankS->SetPosition({ 406.5f,300.0f });
+
+	rankA = Sprite::Create(24, { 0.0f,0.0f });
+	rankA->SetSize({ 467, 83 });
+	rankA->SetPosition({ 406.5f,300.0f });
+
+	rankB = Sprite::Create(25, { 0.0f,0.0f });
+	rankB->SetSize({ 471, 83 });
+	rankB->SetPosition({ 404.5f,300.0f });
+
 	//3Dオブジェクト生成
 
 	//ベース
@@ -323,11 +350,11 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 		eArmPos[i] = { 0, 0, 0 };
 		eArmRot[i] = { 0, 0, 0 };
 		eArmScale[i] = { 10, 10, 10 };
-		eArmObj = Object3d::Create();
-		eArmObj->SetModel(modelFighter);
-		eArmObj->SetPosition({ eArmPos[i] });
-		eArmObj->SetRotation({ eArmRot[i] });
-		eArmObj->SetScale({ eArmScale[i] });
+		eArmObj[i] = Object3d::Create();
+		eArmObj[i]->SetModel(modelFighter);
+		eArmObj[i]->SetPosition({ eArmPos[i] });
+		eArmObj[i]->SetRotation({ 0, 0, 180 });
+		eArmObj[i]->SetScale({ eArmScale[i] });
 	}
 
 	//壁
@@ -406,7 +433,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 	Sound::SoundData soundData2 = sound->SoundLoadWave("Resources/audio/game.wav");
 	Sound::SoundData soundData3 = sound->SoundLoadWave("Resources/audio/clear.wav");
 	Sound::SoundData soundData4 = sound->SoundLoadWave("Resources/audio/gameOver.wav");
-	//sound->SoundPlayWave(soundData1);//サウンド再生
+	//sound->SoundPlayWave(soundData2);//サウンド再生
 
 	//カメラ
 	for (int i = 0; i < _countof(cameraMoveCount); i++)
@@ -432,7 +459,7 @@ void GameScene::Update()
 		}
 
 		//SPACEorSTARTを押すとロード開始
-		if ((input->TriggerKey(DIK_SPACE) || input->TriggerPadKey(BUTTON_START)) && !isLoad)
+		if ((input->TriggerKey(DIK_SPACE) || input->TriggerPadKey(BUTTON_BACK)) && !isLoad)
 		{
 			loadCount = 0;
 			isLoad = true;
@@ -454,7 +481,7 @@ void GameScene::Update()
 			while (wallCount <= 4)
 			{
 				int w = rand() % 24;
-				wallHP[w] = 10;
+				wallHP[w] = 5;
 				isWall[w] = true;
 
 				wallCount = 0;
@@ -548,7 +575,7 @@ void GameScene::Update()
 						{
 							if (circle == 1)
 							{
-								pBullDamage[i] = 3;
+								pBullDamage[i] = 4;
 							}
 
 							else if (circle == 2)
@@ -833,6 +860,39 @@ void GameScene::Update()
 			}
 		}
 
+		//つらら
+		for (int i = 0; i < 5; i++)
+		{
+			if (eArm[i])
+			{
+				pillarCount[i]++;
+
+				//プレイヤーとの判定
+				if (pDamageInterval >= 100 && !isDive && eArmPos[i].y <= 20)
+				{
+					float a = eArmPos[i].x - pPos.x;
+					float b = eArmPos[i].z - pPos.z;
+					float c = sqrt(a * a + b * b);
+
+					if (c <= 20)
+					{
+						playerHP -= 5;
+						eArmPos[i] = { 1000, 1000, 1000 };
+						eArmObj[i]->SetPosition({ eArmPos[i] });
+						eArm[i] = false;
+						shakeFlag = true;
+						pDamageInterval = 0;
+					}
+				}
+
+				if (pillarCount[i] >= 90)
+				{
+					pillarCount[i] = 0;
+					eArm[i] = false;
+				}
+			}
+		}
+
 		//↓この辺よくわからないからコメントアウト書いて↓
 		rad = angle * 3.14f / 180.0f;
 		aroundX = cos(rad) * len / i;
@@ -863,7 +923,6 @@ void GameScene::Update()
 		fixedCamera.x = cos(rad) * len * 2;
 		fixedCamera.y = fixed.y;
 		fixedCamera.z = sin(rad) * len * 2;
-
 		if (!cameraMoveCount[13] && !shakeFlag)
 		{
 			playerObj->SetBillboard(true);
@@ -872,6 +931,36 @@ void GameScene::Update()
 			camera->SetEye(fixedCamera);
 			camera->Update();
 		}
+
+		XMFLOAT3 i = fixedCamera;
+
+		//シェイク
+		if (shakeFlag)
+		{
+			shakeTimer++;
+		}
+
+		if (shakeTimer > 0)
+		{
+			i.x = ((rand() + 80) % (91 - attenuation) - 5) + fixedCamera.x;
+			i.y = ((rand() + 80) % (91 - attenuation) - 5) + fixedCamera.y;
+			i.z = fixedCamera.z;
+		}
+
+		if (shakeTimer >= attenuation * 2)
+		{
+			attenuation += 1;
+		}
+
+		else if (attenuation >= 10)
+		{
+			shakeTimer = 0;
+			attenuation = 0;
+			shakeFlag = false;
+		}
+
+		camera->SetEye(i);
+		camera->Update();
 
 		//↑この辺よくわからないからコメントアウト書いて↑
 
@@ -902,9 +991,9 @@ void GameScene::Update()
 					moveCount++;
 
 					//大技が溜まっていないとき
-					if (moveCount <= 7)
+					if (moveCount <= 6)
 					{
-						enemyMove[0] = rand() % 80 + 1;//行動パターンを決定
+						enemyMove[0] = rand() % 100 + 1;//行動パターンを決定
 
 						//1:自機狙いの弾を発射
 						if (enemyMove[0] <= 30)
@@ -912,7 +1001,7 @@ void GameScene::Update()
 							enemyMove[1] = rand() % 100 + 1;//行動パターンを決定
 
 							//0:冰気錬成
-							if (enemyMove[1] <= 20)
+							if (enemyMove[1] <= 40)
 							{
 								wallCreate = true;
 							}
@@ -937,8 +1026,8 @@ void GameScene::Update()
 									eBullX[i] = pPos.x - ePos.x;
 									eBullY[i] = pPos.z - ePos.z;
 									eBullXY[i] = sqrt(eBullX[i] * eBullX[i] + eBullY[i] * eBullY[i]);
-									eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 10;
-									eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 10;
+									eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 8;
+									eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 8;
 									eBull[i] = true;
 									break;
 								}
@@ -951,7 +1040,7 @@ void GameScene::Update()
 							enemyMove[1] = rand() % 100 + 1;//行動パターンを決定
 
 							//0:冰気錬成
-							if (enemyMove[1] <= 20)
+							if (enemyMove[1] <= 50)
 							{
 								wallCreate = true;
 							}
@@ -966,6 +1055,7 @@ void GameScene::Update()
 							enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
 							eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
 
+							//円形弾
 							for (int i = 0; i < 16; i++)
 							{
 								for (int j = 0; j < 255; j++)
@@ -975,8 +1065,8 @@ void GameScene::Update()
 										eBull2[j] = true;
 										eBullPos2[j] = ePos;
 										eBulletObj2[j]->SetPosition({ eBullPos2[j] });
-										eBullSpeed2Y[j] = sin(62.5 * i * (PI * PI)) * 2;
-										eBullSpeed2X[j] = cos(62.5 * i * (PI * PI)) * 2;
+										eBullSpeed2Y[j] = sin(62.5 * i * (PI * PI)) * 1.5;
+										eBullSpeed2X[j] = cos(62.5 * i * (PI * PI)) * 1.5;
 										break;
 									}
 								}
@@ -989,7 +1079,7 @@ void GameScene::Update()
 							enemyMove[1] = rand() % 100 + 1;//行動パターンを決定
 
 							//0:冰気錬成
-							if (enemyMove[1] <= 20)
+							if (enemyMove[1] <= 100)
 							{
 								wallCreate = true;
 							}
@@ -997,9 +1087,12 @@ void GameScene::Update()
 							//レーザー使用可能ならレーザー
 							if (isLaser)
 							{
-								laserAttack = true;
-								isLaser = false;
+								laserStart = rand() % 360;
+								laserDirection = rand() % 2;
+								barrierAttack = true;
 								isAttack = false;
+								powerFlag = true;
+								isEnemyAtk = true;
 							}
 
 							//使えないなら自機狙い弾
@@ -1032,8 +1125,8 @@ void GameScene::Update()
 										eBullX[i] = pPos.x - ePos.x;
 										eBullY[i] = pPos.z - ePos.z;
 										eBullXY[i] = sqrt(eBullX[i] * eBullX[i] + eBullY[i] * eBullY[i]);
-										eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 10;
-										eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 10;
+										eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 8;
+										eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 8;
 										eBull[i] = true;
 										break;
 									}
@@ -1041,50 +1134,35 @@ void GameScene::Update()
 							}
 						}
 
-						//4:ダメージレーンを展開
+						//4:つらら落とし
 						else if (81 <= enemyMove[0] && enemyMove[0] <= 100)
 						{
 							enemyMove[1] = rand() % 100 + 1;//行動パターンを決定
 
 							//0:冰気錬成
-							if (enemyMove[1] <= 20)
+							if (enemyMove[1] <= 50)
 							{
 								wallCreate = true;
 							}
 
 							isLaser = true;
-
-							//ダメージレーン使用可能なら展開
-							if (isLaser)
-							{
-
-							}
-
-							//使えないなら16方向弾
-							else
-							{
-								
-							}
+							eArmCount = 0;
+							iceCount = 0;
+							isArm = true;
+							isAttack = false;
+							isEnemyAtk = true;
 						}
 					}
 
 					//5:巨大な腕で押し潰す
 					else
 					{
+						powerFlag = true;
 						moveCount = 0;
-						eArmCount = 0;
-						iceCount = 0;
-						isArm = true;
+						isEnemyAtk = true;
+						laserAttack = true;
+						isLaser = true;
 						isAttack = false;
-
-						for (int i = 0; i < 5; i++)
-						{
-							eArmPos[i] = { 0, 60, 0 };
-							eArmScale[i] = { 0, 0, 0 };
-							eArmObj->SetPosition({ eArmPos[i] });
-							eArmObj->SetScale({ eArmScale[i] });
-							eArm[i] = false;
-						}
 					}
 				}
 			}
@@ -1092,15 +1170,187 @@ void GameScene::Update()
 			//ボスの行動パターン（発狂後）
 			else
 			{
-				//攻撃間隔チェック
-				if (eAttackInterval >= 40)
-				{
-					//大技チェック
-					if (moveCount <= 3)
-					{
+			//攻撃間隔チェック
+			if (eAttackInterval >= 50)
+			{
+				eAttackInterval = 0;//攻撃間隔リセット
+				moveCount++;
 
+				//大技が溜まっていないとき
+				if (moveCount <= 5)
+				{
+					enemyMove[0] = rand() % 100 + 1;//行動パターンを決定
+
+					//1:自機狙いの弾を発射
+					if (enemyMove[0] <= 30)
+					{
+						enemyMove[1] = rand() % 100 + 1;//行動パターンを決定
+
+						//0:冰気錬成
+						if (enemyMove[1] <= 60)
+						{
+							wallCreate = true;
+						}
+
+						isLaser = true;
+						angleX = pPos.x - ePos.x;
+						angleZ = pPos.z - ePos.z;
+
+						eAngle = atan2(angleX, angleZ);
+
+						enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+						eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+
+						//画面上に存在しない弾を一つ選んでボスの位置にセット
+						for (int i = 0; i < 255; i++)
+						{
+							if (!eBull[i])
+							{
+								eBullPos[i] = ePos;
+								eBullPos[i].y += 35;
+								eBulletObj[i]->SetPosition({ eBullPos[i] });
+								eBullX[i] = pPos.x - ePos.x;
+								eBullY[i] = pPos.z - ePos.z;
+								eBullXY[i] = sqrt(eBullX[i] * eBullX[i] + eBullY[i] * eBullY[i]);
+								eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 8;
+								eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 8;
+								eBull[i] = true;
+								break;
+							}
+						}
+					}
+
+					//2:16方向に大きめの弾を2発発射
+					else if (31 <= enemyMove[0] && enemyMove[0] <= 55)
+					{
+						enemyMove[1] = rand() % 100 + 1;//行動パターンを決定
+
+						//0:冰気錬成
+						if (enemyMove[1] <= 70)
+						{
+							wallCreate = true;
+						}
+
+						isLaser = true;
+						bulletCount = 0;
+						angleX = pPos.x - ePos.x;
+						angleZ = pPos.z - ePos.z;
+
+						eAngle = atan2(angleX, angleZ);
+
+						enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+						eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+
+						//円形弾
+						for (int i = 0; i < 16; i++)
+						{
+							for (int j = 0; j < 255; j++)
+							{
+								if (!eBull2[j])
+								{
+									eBull2[j] = true;
+									eBullPos2[j] = ePos;
+									eBulletObj2[j]->SetPosition({ eBullPos2[j] });
+									eBullSpeed2Y[j] = sin(62.5 * i * (PI * PI)) * 1.5;
+									eBullSpeed2X[j] = cos(62.5 * i * (PI * PI)) * 1.5;
+									break;
+								}
+							}
+						}
+					}
+
+					//3:（半）時計回りに1周するレーザー状の弾幕
+					else if (56 <= enemyMove[0] && enemyMove[0] <= 80)
+					{
+						enemyMove[1] = rand() % 100 + 1;//行動パターンを決定
+
+						//0:冰気錬成
+						if (enemyMove[1] <= 100)
+						{
+							wallCreate = true;
+						}
+
+						//レーザー使用可能ならレーザー
+						if (isLaser)
+						{
+							laserStart = rand() % 360;
+							laserDirection = rand() % 2;
+							barrierAttack = true;
+							isAttack = false;
+							isEnemyAtk = true;
+							powerFlag = true;
+						}
+
+						//使えないなら自機狙い弾
+						else
+						{
+							angleX = pPos.x - ePos.x;
+							angleZ = pPos.z - ePos.z;
+
+							eAngle = atan2(angleX, angleZ);
+
+							enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+
+							isLaser = true;
+							angleX = pPos.x - ePos.x;
+							angleZ = pPos.z - ePos.z;
+
+							eAngle = atan2(angleX, angleZ);
+
+							enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+							eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+
+							//画面上に存在しない弾を一つ選んでボスの位置にセット
+							for (int i = 0; i < 255; i++)
+							{
+								if (!eBull[i])
+								{
+									eBullPos[i] = ePos;
+									eBullPos[i].y += 35;
+									eBulletObj[i]->SetPosition({ eBullPos[i] });
+									eBullX[i] = pPos.x - ePos.x;
+									eBullY[i] = pPos.z - ePos.z;
+									eBullXY[i] = sqrt(eBullX[i] * eBullX[i] + eBullY[i] * eBullY[i]);
+									eBullSpeedX[i] = eBullX[i] / eBullXY[i] * 8;
+									eBullSpeedY[i] = eBullY[i] / eBullXY[i] * 8;
+									eBull[i] = true;
+									break;
+								}
+							}
+						}
+					}
+
+					//4:つらら落とし
+					else if (81 <= enemyMove[0] && enemyMove[0] <= 100)
+					{
+						enemyMove[1] = rand() % 100 + 1;//行動パターンを決定
+
+						//0:冰気錬成
+						if (enemyMove[1] <= 50)
+						{
+							wallCreate = true;
+						}
+
+						isLaser = true;
+						eArmCount = 0;
+						iceCount = 0;
+						isArm = true;
+						isAttack = false;
+						isEnemyAtk = true;
 					}
 				}
+
+				//5:巨大な腕で押し潰す
+				else
+				{
+					powerFlag = true;
+					moveCount = 0;
+					isEnemyAtk = true;
+					laserAttack = true;
+					isLaser = true;
+					isAttack = false;
+				}
+			}
 			}
 
 			//冰気錬成
@@ -1116,9 +1366,9 @@ void GameScene::Update()
 					}
 				}
 
-				if (wallCount < 10)
+				if (wallCount < 15)
 				{
-					wallHP[w] = 10;
+					wallHP[w] = 5;
 					wallPos[w].y = -32;
 					isWall[w] = true;
 					wallObj[w]->SetPosition({ wallPos[w] });
@@ -1143,8 +1393,150 @@ void GameScene::Update()
 			//レーザー攻撃
 			if (laserAttack)
 			{
-				laserAttack = false;
-				isAttack = true;
+				laserCount++;
+
+				if (enemyHP > maxEnemyHP / 2)
+				{
+					if (laserCount >= 120)
+					{
+						laserCount2++;
+
+						//円形弾
+						for (int i = 0; i < 255; i++)
+						{
+							if (!eBull[i])
+							{
+								eBull[i] = true;
+								eBullPos[i] = ePos;
+								eBulletObj[i]->SetPosition({ eBullPos[i] });
+								eBullSpeedY[i] = sin(laserCount2 * 10 * (PI * PI)) * 10;
+								eBullSpeedX[i] = cos(laserCount2 * 10 * (PI * PI)) * 10;
+								break;
+							}
+						}
+					}
+
+					else
+					{
+						wallCreate = true;
+					}
+				}
+
+				else
+				{
+					if (laserCount >= 80)
+					{
+						laserCount2++;
+
+						//円形弾
+						for (int i = 0; i < 255; i++)
+						{
+							if (!eBull[i])
+							{
+								eBull[i] = true;
+								eBullPos[i] = ePos;
+								eBulletObj[i]->SetPosition({ eBullPos[i] });
+								eBullSpeedY[i] = sin(laserCount2 * 10 * (PI * PI)) * 10;
+								eBullSpeedX[i] = cos(laserCount2 * 10 * (PI * PI)) * 10;
+								break;
+							}
+						}
+					}
+
+					else
+					{
+						wallCreate = true;
+					}
+				}
+
+				if (laserCount2 >= 100)
+				{
+					laserCount = 0;
+					laserCount2 = 0;
+					isEnemyAtk = false;
+					laserAttack = false;
+					isAttack = true;
+					powerFlag = false;
+				}
+			}
+
+			//本物のレーザー
+			if (barrierAttack)
+			{
+				barrierCount++;
+
+				if (barrierCount >= 60)
+				{
+					if (laserDirection == 0)
+					{
+						barrierCount2 += 4;
+					}
+
+					else
+					{
+						barrierCount2 -= 4;
+					}
+
+					//円形弾
+					for (int i = 0; i < 255; i++)
+					{
+						if (!eBull[i])
+						{
+							eBull[i] = true;
+							eBullPos[i] = ePos;
+							eBulletObj[i]->SetPosition({ eBullPos[i] });
+							eBullSpeedY[i] = sin((laserStart + barrierCount2) * PI / 180) * 20;
+							eBullSpeedX[i] = cos((laserStart + barrierCount2) * PI / 180) * 20;
+							break;
+						}
+					}
+				}
+
+				else
+				{
+					if (barrierCount % 10 == 0)
+					{
+						//円形弾
+						for (int i = 0; i < 255; i++)
+						{
+							if (!eBull[i])
+							{
+								eBull[i] = true;
+								eBullPos[i] = ePos;
+								eBulletObj[i]->SetPosition({ eBullPos[i] });
+								eBullSpeedY[i] = sin((laserStart + barrierCount2) * PI / 180) * 2;
+								eBullSpeedX[i] = cos((laserStart + barrierCount2) * PI / 180) * 2;
+								break;
+							}
+						}
+					}
+				}
+
+				if (enemyHP > maxEnemyHP / 2)
+				{
+					if (barrierCount2 >= 400 || barrierCount2 <= -400)
+					{
+						barrierCount = 0;
+						barrierCount2 = 0;
+						isEnemyAtk = false;
+						barrierAttack = false;
+						isAttack = true;
+						powerFlag = false;
+					}
+				}
+
+				else
+				{
+					if (barrierCount2 >= 700 || barrierCount2 <= -700)
+					{
+						barrierCount = 0;
+						barrierCount2 = 0;
+						isEnemyAtk = false;
+						barrierAttack = false;
+						isAttack = true;
+						powerFlag = false;
+					}
+				}
 			}
 
 			//腕攻撃
@@ -1152,29 +1544,82 @@ void GameScene::Update()
 			{
 				eArmCount++;
 
-				if (eArmCount >= 30)
+				if (enemyHP > maxEnemyHP / 2)
 				{
-					for (int i = 0; i < 5; i++)
+					if (eArmCount >= 40 && iceCount == 0)
 					{
-						if (!eArm[i])
+						for (int i = 0; i < 5; i++)
 						{
-							eArmPos[i] = pPos;
-							eArmPos[i].y = 120;
-							eArmObj->SetPosition({ eArmPos[i] });
-							eArm[i] = true;
-							eArmCount = 0;
-							iceCount++;
-							break;
+							if (!eArm[i])
+							{
+								angleX = pPos.x - ePos.x;
+								angleZ = pPos.z - ePos.z;
+
+								eAngle = atan2(angleX, angleZ);
+
+								enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+								eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+
+								eArmPos[i] = pPos;
+								eArmPos[i].y = 180;
+								eArmScale[i] = { 0, 0, 0 };
+								eArmObj[i]->SetPosition({ eArmPos[i] });
+								eArmObj[i]->SetScale({ eArmScale[i] });
+								eArm[i] = true;
+								eArmCount = 0;
+								iceCount++;
+								break;
+							}
 						}
+					}
+
+					if (eArmCount >= 100 && iceCount >= 1)
+					{
+						eArmCount = 0;
+						iceCount = 0;
+						isArm = false;
+						isAttack = true;
+						isEnemyAtk = false;
 					}
 				}
 
-				if (iceCount >= 3)
+				else
 				{
-					eArmCount = 0;
-					iceCount = 0;
-					isArm = false;
-					isAttack = true;
+					if (eArmCount >= 40 && iceCount <= 3)
+					{
+						for (int i = 0; i < 5; i++)
+						{
+							if (!eArm[i])
+							{
+								angleX = pPos.x - ePos.x;
+								angleZ = pPos.z - ePos.z;
+
+								eAngle = atan2(angleX, angleZ);
+
+								enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+								eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+
+								eArmPos[i] = pPos;
+								eArmPos[i].y = 180;
+								eArmScale[i] = { 0, 0, 0 };
+								eArmObj[i]->SetPosition({ eArmPos[i] });
+								eArmObj[i]->SetScale({ eArmScale[i] });
+								eArm[i] = true;
+								eArmCount = 0;
+								iceCount++;
+								break;
+							}
+						}
+					}
+
+					if (eArmCount >= 100 && iceCount >= 3)
+					{
+						eArmCount = 0;
+						iceCount = 0;
+						isArm = false;
+						isAttack = true;
+						isEnemyAtk = false;
+					}
 				}
 			}
 
@@ -1184,18 +1629,18 @@ void GameScene::Update()
 				{
 					if (eArmScale[i].x <= 20)
 					{
-						eArmScale[i].x += 2;
-						eArmScale[i].y += 2;
-						eArmScale[i].z += 2;
-						eArmObj->SetScale({ eArmScale[i] });
+						eArmScale[i].x += 0.5;
+						eArmScale[i].y += 0.5;
+						eArmScale[i].z += 0.5;
+						eArmObj[i]->SetScale({ eArmScale[i] });
 					}
 
 					else
 					{
 						if (eArmPos[i].y >= 0)
 						{
-							eArmPos[i].y -= 6;
-							eArmObj->SetPosition({ eArmPos[i] });
+							eArmPos[i].y -= 12;
+							eArmObj[i]->SetPosition({ eArmPos[i] });
 						}
 					}
 				}
@@ -1270,7 +1715,7 @@ void GameScene::Update()
 			}
 
 			//SPACEorSTARTを押すとロード開始
-			if ((input->TriggerKey(DIK_SPACE) || input->TriggerPadKey(BUTTON_START)) && !isLoad)
+			if ((input->TriggerKey(DIK_SPACE) || input->TriggerPadKey(BUTTON_BACK)) && !isLoad)
 			{
 				loadCount = 0;
 				isLoad = true;
@@ -1286,10 +1731,121 @@ void GameScene::Update()
 		//各種初期化を行いタイトルへ
 		if (loadCount >= 20)
 		{
+			circle = 2;//プレイヤーのいる円周の位置。1が最低値で数が大きい方が外側
+			maxCircle = 3;//現在の円周の最大数
+
+			basePos = { 0,0,5 };//土台の座標
+			baseScale = { 230, 230, 230 };//土台のスケール
+			
+			for (int i = 0; i < 24; i++)
+			{
+				isWall[i] = false;//壁が出ているか
+				wallHP[i] = 5;
+			}
+
+			playerHP = 20;//プレイヤーの体力
+			maxPlayerHP = 20;//プレイヤーの最大体力
+			pPos = { 0, 0, 120 };//プレイヤーの座標
+			pRot = { 0, 0, 0 };//プレイヤーの傾き
+			pScale = { 5, 5, 5 };//プレイヤーの大きさ
+			pBullInterval = 30;
+			
+			for (int i = 0; i < 255; i++)
+			{
+				eBull[i] = false;//敵の弾が画面上に出ているかどうか
+				eBull2[i] = false;//敵の弾が画面上に出ているかどうか
+				pBull[i] = false;//プレイヤーの弾が画面上に出ているかどうか
+			}
+
+			speed = 2.0f;
+			accel = 1.5f;//加速の倍率
+			pDamageInterval = 50;//敵の被弾時の無敵時間
+
+			enemyHP = 100;//敵の体力
+			maxEnemyHP = 100;//敵の最大体力
+			eDamageInterval = 50;//敵の被弾時の無敵時間
+			ePos = { 0, 0, 0 };//敵の座標
+			eRot = { 0, 180, 0 };
+			eScale = { 10, 10, 10 };//敵の大きさ
+			eAttackInterval = 0;//敵の行動の間隔
+			wallCount = 0;
+			isDive = false;//潜る
+			direction = false;//潜るときの進行方向
+			diveMove[0] = false;//潜った後の移動
+			diveMove[1] = false;//潜った後の移動
+			diveMove[2] = false;//潜った後の移動
+
+			posX = 0.0f;
+			posZ = 0.0f;
+			rad = 0.0f;
+			angle = 90.0f;
+			len = 60.0f;
+			aroundX = 0.0f;
+			aroundZ = 0.0f;
+			angleX = 0.0f;
+			angleZ = 0.0f;
+			eAngle = 0.0f;
+
+			shakeFlag = false;
+			shakeTimer = 0;
+			attenuation = 0;
+
+			for (int i = 0; i < 5; i++)
+			{
+				pillarCount[i] = 0;
+				eArm[i] = false;//腕の表示
+			}
+
+			fixed = camera->GetEye();
+			cameraMove = { 0, 80, 140 };
+			cameraRad = 0.0f;
+			cameraAngle = 90.0f;
+			i = 1.0f;
+			hit = false;
+			logoCount = 0;//タイトル点滅カウント
+			isLoad = false;//ロード
+			loadCount = 0;//ロード時間
+			endCount = 0;//ゲームオーバー後の入力待ち時間
+			enemyMove[0] = 0;//行動判定用
+			enemyMove[1] = 0;//行動判定用
+			moveCount = 0;//行動した回数
+			isLaser = true;//レーザー使用可能か
+			isBarrier = true;//ダメージレーン使用可能か
+			isAttack = true;//攻撃が終わったか
+			laserAttack = false;//レーザー発動中か
+			barrierAttack = false;
+			laserCount = 0;//レーザーの時間(回転前)
+			laserCount2 = 0;//レーザーの時間(回転後)
+			barrierCount = 0;//レーザーの時間(回転前)
+			barrierCount2 = 0;//レーザーの時間(回転後)
+			wallCreate = false;//壁生成中か
+			isArm = false;//腕攻撃中か
+			eArmCount = 0;//腕の動作用
+			iceCount = 0;
+			PI = 3.1415926;
+			bulletCount = 0;
+			clearTime = 0;
+			isEnemyAtk = false;
+			laserStart = 0;
+			laserDirection = 0;
+			rank = 0;//0がBで2がS
+			powerFlag = false;
+
 			endCount = 0;
 			loadCount = 0;
 			isLoad = false;
 			sceneNum = Title;
+
+			playerObj->SetPosition({ pPos });
+			playerObj->SetRotation({ pPos });
+
+			//カメラ
+			for (int i = 0; i < _countof(cameraMoveCount); i++)
+			{
+				cameraMoveCount[i] = true;
+			}
+
+			camera->Update();
 		}
 
 		/*
@@ -1352,7 +1908,7 @@ void GameScene::Update()
 			}
 
 			//SPACEorSTARTを押すとロード開始
-			if ((input->TriggerKey(DIK_SPACE) || input->TriggerPadKey(BUTTON_START)) && !isLoad)
+			if ((input->TriggerKey(DIK_SPACE) || input->TriggerPadKey(BUTTON_BACK)) && !isLoad)
 			{
 				loadCount = 0;
 				isLoad = true;
@@ -1368,10 +1924,121 @@ void GameScene::Update()
 		//各種初期化を行いタイトルへ
 		if (loadCount >= 20)
 		{
+			circle = 2;//プレイヤーのいる円周の位置。1が最低値で数が大きい方が外側
+			maxCircle = 3;//現在の円周の最大数
+
+			basePos = { 0,0,5 };//土台の座標
+			baseScale = { 230, 230, 230 };//土台のスケール
+
+			for (int i = 0; i < 24; i++)
+			{
+				isWall[i] = false;//壁が出ているか
+				wallHP[i] = 5;
+			}
+
+			playerHP = 20;//プレイヤーの体力
+			maxPlayerHP = 20;//プレイヤーの最大体力
+			pPos = { 0, 0, 120 };//プレイヤーの座標
+			pRot = { 0, 0, 0 };//プレイヤーの傾き
+			pScale = { 5, 5, 5 };//プレイヤーの大きさ
+			pBullInterval = 30;
+
+			for (int i = 0; i < 255; i++)
+			{
+				eBull[i] = false;//敵の弾が画面上に出ているかどうか
+				eBull2[i] = false;//敵の弾が画面上に出ているかどうか
+				pBull[i] = false;//プレイヤーの弾が画面上に出ているかどうか
+			}
+
+			speed = 2.0f;
+			accel = 1.5f;//加速の倍率
+			pDamageInterval = 50;//敵の被弾時の無敵時間
+
+			enemyHP = 100;//敵の体力
+			maxEnemyHP = 100;//敵の最大体力
+			eDamageInterval = 50;//敵の被弾時の無敵時間
+			ePos = { 0, 0, 0 };//敵の座標
+			eRot = { 0, 180, 0 };
+			eScale = { 10, 10, 10 };//敵の大きさ
+			eAttackInterval = 0;//敵の行動の間隔
+			wallCount = 0;
+			isDive = false;//潜る
+			direction = false;//潜るときの進行方向
+			diveMove[0] = false;//潜った後の移動
+			diveMove[1] = false;//潜った後の移動
+			diveMove[2] = false;//潜った後の移動
+
+			posX = 0.0f;
+			posZ = 0.0f;
+			rad = 0.0f;
+			angle = 90.0f;
+			len = 60.0f;
+			aroundX = 0.0f;
+			aroundZ = 0.0f;
+			angleX = 0.0f;
+			angleZ = 0.0f;
+			eAngle = 0.0f;
+
+			shakeFlag = false;
+			shakeTimer = 0;
+			attenuation = 0;
+
+			for (int i = 0; i < 5; i++)
+			{
+				pillarCount[i] = 0;
+				eArm[i] = false;//腕の表示
+			}
+
+			fixed = camera->GetEye();
+			cameraMove = { 0, 80, 140 };
+			cameraRad = 0.0f;
+			cameraAngle = 90.0f;
+			i = 1.0f;
+			hit = false;
+			logoCount = 0;//タイトル点滅カウント
+			isLoad = false;//ロード
+			loadCount = 0;//ロード時間
+			endCount = 0;//ゲームオーバー後の入力待ち時間
+			enemyMove[0] = 0;//行動判定用
+			enemyMove[1] = 0;//行動判定用
+			moveCount = 0;//行動した回数
+			isLaser = true;//レーザー使用可能か
+			isBarrier = true;//ダメージレーン使用可能か
+			isAttack = true;//攻撃が終わったか
+			laserAttack = false;//レーザー発動中か
+			barrierAttack = false;
+			laserCount = 0;//レーザーの時間(回転前)
+			laserCount2 = 0;//レーザーの時間(回転後)
+			barrierCount = 0;//レーザーの時間(回転前)
+			barrierCount2 = 0;//レーザーの時間(回転後)
+			wallCreate = false;//壁生成中か
+			isArm = false;//腕攻撃中か
+			eArmCount = 0;//腕の動作用
+			iceCount = 0;
+			PI = 3.1415926;
+			bulletCount = 0;
+			clearTime = 0;
+			isEnemyAtk = false;
+			laserStart = 0;
+			laserDirection = 0;
+			rank = 0;//0がBで2がS
+			powerFlag = false;
+
 			endCount = 0;
 			loadCount = 0;
 			isLoad = false;
 			sceneNum = Title;
+
+			playerObj->SetPosition({ pPos });
+			playerObj->SetRotation({ pPos });
+
+			//カメラ
+			for (int i = 0; i < _countof(cameraMoveCount); i++)
+			{
+				cameraMoveCount[i] = true;
+			}
+
+			camera->Update();
 		}
 	}
 
@@ -1388,7 +2055,10 @@ void GameScene::Update()
 		enemyObj->Update();
 	}
 
-	eArmObj->Update();
+	for (int i = 0; i < 5; i++)
+	{
+		eArmObj[i]->Update();
+	}
 
 	for (int i = 0; i < 255; i++)
 	{
@@ -1401,37 +2071,6 @@ void GameScene::Update()
 	{
 		wallObj[i]->Update();
 	}
-
-	
-	XMFLOAT3 i = fixedCamera;
-
-	//シェイク
-	if (shakeFlag)
-	{
-		shakeTimer++;
-	}
-
-	if (shakeTimer > 0)
-	{
-		i.x = ((rand() + 80) % (91 - attenuation) - 5);
-		i.y = ((rand() + 80) % (91 - attenuation) - 5);
-	}
-
-	if (shakeTimer >= attenuation * 60)
-	{
-		attenuation += 1;
-	}
-
-	else if (attenuation >= 100)
-	{
-		shakeTimer = 0;
-		attenuation = 0;
-		shakeFlag = false;
-	}
-
-	camera->SetEye(i);
-	camera->Update();
-	
 
 	//パーティクル
 	if (circle == 3)
@@ -1499,7 +2138,10 @@ void GameScene::Update()
 			color.y = (float)rand() / RAND_MAX * 1;
 			color.z = (float)rand() / RAND_MAX * 1;
 			//追加
-			enemyParticleMan->Add(60, ePos, vel, acc, 10.0f, 0.0f, color, { 0,0,0,0 });
+			if (powerFlag)
+			{
+				enemyParticleMan->Add(60, ePos, vel, acc, 10.0f, 0.0f, color, { 0,0,0,0 });
+			}
 		}
 
 		playerParticleMan->Update();
@@ -1577,7 +2219,7 @@ void GameScene::Draw()
 		{
 			if (eArm[i] == true)
 			{
-				eArmObj->Draw();
+				eArmObj[i]->Draw();
 			}
 		}
 
@@ -1646,7 +2288,7 @@ void GameScene::Draw()
 	//3:リザルト画面
 	else if (sceneNum == Clear)
 	{
-
+		
 	}
 
 	//4:ゲームオーバー画面
@@ -1691,6 +2333,22 @@ void GameScene::Draw()
 	//3:リザルト画面
 	else if (sceneNum == Clear)
 	{
+		if (rank == 2)
+		{
+			rankS->Draw();
+		}
+
+		else if (rank == 1)
+		{
+			rankA->Draw();
+		}
+
+		else
+		{
+			rankB->Draw();
+		}
+
+		/*
 		clear->Draw();//背景スプライト描画
 		takendamage->Draw();//背景スプライト描画
 
@@ -1707,6 +2365,7 @@ void GameScene::Draw()
 			num8[i]->Draw();
 			num9[i]->Draw();
 		}
+		*/
 
 		//ゲームスタート（点滅あり）
 		if (logoCount <= 20 && endCount >= 120)
