@@ -95,6 +95,7 @@
     <ClCompile Include="Object3d.cpp" />
     <ClCompile Include="ParticleEmitter.cpp" />
     <ClCompile Include="ParticleManager.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="WinApp.cpp" />
   </ItemGroup>
@@ -114,6 +115,7 @@
     <ClInclude Include="ParticleEmitter.h" />
     <ClInclude Include="ParticleManager.h" />
     <ClInclude Include="SafeDelete.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="WinApp.h" />
   </ItemGroup>

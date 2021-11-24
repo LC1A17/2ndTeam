@@ -25,7 +25,7 @@ GameScene::~GameScene()
 }
 
 //初期化処理
-void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
+void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 {
 	//nullptrチェック
 	assert(dxCommon);
@@ -34,7 +34,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 
 	this->dxCommon = dxCommon;
 	this->input = input;
-	this->audio = audio;
+	this->sound = sound;
 
 	//デバッグテキスト用テクスチャ読み込み
 	if (!Sprite::LoadTexture(debugTextTexNumber, L"Resources/debugfont.png"))
@@ -93,6 +93,11 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		assert(0);
 	}
 
+	if (!Sprite::LoadTexture(10, L"Resources/game2.png"))
+	{
+		assert(0);
+	}
+
 	//背景スプライト生成
 	gamestart = Sprite::Create(1, { 0.0f,0.0f });
 	gamestart->SetSize({ 830, 46 });
@@ -125,6 +130,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	playerHpFlame = Sprite::Create(8, { 0.0f,0.0f });
 	playerHpFlame->SetSize({ 330, 36 });
 	playerHpFlame->SetPosition({ 20.0f, WinApp::window_height - 60 });
+
+	gameover = Sprite::Create(9, { 0.0f,0.0f });
+	gameover->SetSize({ WinApp::window_width, WinApp::window_height });
+	gameover->SetPosition({ 0.0f,0.0f });
+
+	gameBack2 = Sprite::Create(10, { 0.0f,0.0f });
+	gameBack2->SetSize({ WinApp::window_width, WinApp::window_height });
+	gameBack2->SetPosition({ 0.0f,0.0f });
 
 	//3Dオブジェクト生成
 
@@ -265,7 +278,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 	playerParticleMan = ParticleManager::Create();//パーティクル生成
 	enemyParticleMan = ParticleManager::Create();//パーティクル生成
 
-	//audio->PlayWave("Resources/title.wav");//サウンド再生
+	//Sound::SoundData soundData1 = sound->SoundLoadWave("Resources/audio/title.wav");
+	//sound->SoundPlayWave(soundData1);//サウンド再生
 
 	//カメラ
 	for (int i = 0; i < _countof(cameraMoveCount); i++)
@@ -1194,6 +1208,13 @@ void GameScene::Update()
 
 	camera->Update();
 
+	//パーティクル
+	if (circle == 3)
+	{
+		playerParticleMan->Update();
+		enemyParticleMan->EaseInUpdate(ePos);
+	}
+
 	if (sceneNum == Game)
 	{
 		for (int i = 0; i < 10; i++)
@@ -1279,7 +1300,7 @@ void GameScene::Draw()
 	//2:ゲーム画面
 	else if (sceneNum == Game)
 	{
-		gameBack->Draw();//背景
+		gameBack2->Draw();//背景
 	}
 
 	//3:リザルト画面

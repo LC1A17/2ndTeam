@@ -8,6 +8,7 @@
 #include "Object3d.h"
 #include "DebugText.h"
 #include "Audio.h"
+#include "Sound.h"
 #include "Model.h"
 #include "ParticleManager.h"
 #include "Camera.h"
@@ -37,7 +38,7 @@ public:
 public://メンバ関数
 	GameScene();//コンストクラタ
 	~GameScene();//デストラクタ
-	void Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio);//初期化
+	void Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound);//初期化
 	void Update();//毎フレーム処理
 	void Draw();//描画
 	void StartCameraMove(); //最初のカメラの動き
@@ -45,7 +46,7 @@ public://メンバ関数
 private: // メンバ変数
 	DirectXCommon* dxCommon = nullptr;
 	Input* input = nullptr;
-	Audio* audio = nullptr;
+	Sound* sound = nullptr;
 	DebugText debugText;
 
 	// ゲームシーン用
@@ -58,6 +59,8 @@ private: // メンバ変数
 	Sprite* enemyHpFlame = nullptr;
 	Sprite* playerHp = nullptr;
 	Sprite* playerHpFlame = nullptr;
+	Sprite* gameover = nullptr;
+	Sprite* gameBack2 = nullptr;
 	Model* modelFighter = nullptr;
 
 	Object3d* baseObj = nullptr;//フィールド

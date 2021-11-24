@@ -1,6 +1,6 @@
 ﻿#include "WinApp.h"
 #include "DirectXCommon.h"
-#include "Audio.h"
+#include "Sound.h"
 #include "GameScene.h"
 
 //# Windowsアプリでのエントリーポイント(main関数)
@@ -10,7 +10,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	WinApp* win = nullptr;
 	DirectXCommon* dxCommon = nullptr;
 	Input* input = nullptr;
-	Audio* audio = nullptr;
+	Sound* sound = nullptr;
 	GameScene* gameScene = nullptr;
 
 	// ゲームウィンドウの作成
@@ -28,12 +28,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	input->Initialize(win->GetInstance(), win->GetHwnd());
 
 	// オーディオの初期化
-	audio = new Audio();
-	if (!audio->Initialize())
-	{
-		assert(0);
-		return 1;
-	}
+	sound = new Sound();
+	sound->Initialize();
+
 	// スプライト静的初期化
 	if (!Sprite::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height))
 	{
@@ -59,7 +56,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
-	gameScene->Initialize(dxCommon, input, audio);
+	gameScene->Initialize(dxCommon, input, sound);
 
 	while (true)  // ゲームループ
 	{
@@ -100,7 +97,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//解放
 	// 各種解放
 	safe_delete(gameScene);
-	safe_delete(audio);
+	safe_delete(sound);
 	safe_delete(input);
 	safe_delete(dxCommon);
 
