@@ -88,6 +88,11 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		assert(0);
 	}
 
+	if (!Sprite::LoadTexture(9, L"Resources/gameover.png"))
+	{
+		assert(0);
+	}
+
 	//背景スプライト生成
 	gamestart = Sprite::Create(1, { 0.0f,0.0f });
 	gamestart->SetSize({ 830, 46 });
@@ -166,8 +171,18 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio)
 		eBullScale[i] = { 20, 20, 20 };
 		eBulletObj[i] = Object3d::Create();
 		eBulletObj[i]->SetModel(modelFighter);
-		eBulletObj[i]->SetPosition({ pBullPos[i] });
-		eBulletObj[i]->SetScale({ pBullScale[i] });
+		eBulletObj[i]->SetPosition({ eBullPos[i] });
+		eBulletObj[i]->SetScale({ eBullScale[i] });
+	}
+
+	for (int i = 0; i < 255; i++)
+	{
+		eBullPos2[i] = { 1000, 1000, 1000 };
+		eBullScale2[i] = { 20, 20, 20 };
+		eBulletObj2[i] = Object3d::Create();
+		eBulletObj2[i]->SetModel(modelFighter);
+		eBulletObj2[i]->SetPosition({ eBullPos2[i] });
+		eBulletObj2[i]->SetScale({ eBullScale2[i] });
 	}
 
 	//腕
@@ -389,7 +404,21 @@ void GameScene::Update()
 						//ボスの位置を捕捉
 						if (!pBull[i])
 						{
-							pBullDamage[i] = circle;
+							if (circle == 1)
+							{
+								pBullDamage[i] = 3;
+							}
+
+							else if (circle == 2)
+							{
+								pBullDamage[i] = 2;
+							}
+
+							else
+							{
+								pBullDamage[i] = 1;
+							}
+
 							pOldPos[i] = pPos;
 							pBullPos[i] = pPos;
 							pBullPos[i].y += 20;
@@ -567,6 +596,13 @@ void GameScene::Update()
 				eBulletObj[i]->SetPosition({ eBullPos[i] });
 			}
 
+			if (eBull2[i])
+			{
+				eBullPos2[i].x += eBullSpeed2X[i];
+				eBullPos2[i].z += eBullSpeed2Y[i];
+				eBulletObj2[i]->SetPosition({ eBullPos2[i] });
+			}
+
 			//壁との判定
 			for (int j = 0; j < 24; j++)
 			{
@@ -605,6 +641,14 @@ void GameScene::Update()
 				eBullPos[i] = { 1000, 1000, 1000 };
 				eBulletObj[i]->SetPosition({ eBullPos[i] });
 				eBull[i] = false;
+			}
+
+			//範囲外に出た弾をfalseにする
+			if (eBullPos2[i].x <= -1000 || eBullPos2[i].x >= 1000 || eBullPos2[i].z <= -1000 || eBullPos2[i].z >= 1000)
+			{
+				eBullPos2[i] = { 1000, 1000, 1000 };
+				eBulletObj2[i]->SetPosition({ eBullPos2[i] });
+				eBull2[i] = false;
 			}
 		}
 
@@ -722,6 +766,24 @@ void GameScene::Update()
 							}
 
 							isLaser = true;
+							bulletCount = 0;
+
+							while (bulletCount < 16)
+							{
+								for (int i = 0; i < 255; i++)
+								{
+									if (!eBull2[i] && eBullSpeed2X[i] == 0 && eBullSpeed2Y[i] == 0)
+									{
+										bulletCount++;
+										eBull2[i] = true;
+										eBullPos2[i] = ePos;
+										eBulletObj2[i]->SetPosition({ eBullPos2[i] });
+										eBullSpeed2Y[i] = tan(bulletCount / 16 * (PI * PI)) * 0.6;
+										eBullSpeed2X[i] = cos(bulletCount / 16 * (PI * PI)) * 0.6;
+										break;
+									}
+								}
+							}
 						}
 
 						//3:（半）時計回りに1周するレーザー状の弾幕
@@ -1117,6 +1179,7 @@ void GameScene::Update()
 	{
 		pBulletObj[i]->Update();
 		eBulletObj[i]->Update();
+		eBulletObj2[i]->Update();
 	}
 
 	for (int i = 0; i < 24; i++)
@@ -1263,14 +1326,19 @@ void GameScene::Draw()
 
 		for (int i = 0; i < 255; i++)
 		{
-			if (pBull[i] == true)
+			if (pBull[i])
 			{
 				pBulletObj[i]->Draw();
 			}
 
-			if (eBull[i] == true)
+			if (eBull[i])
 			{
 				eBulletObj[i]->Draw();
+			}
+
+			if (eBull2[i])
+			{
+ 				eBulletObj2[i]->Draw();
 			}
 		}
 

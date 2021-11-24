@@ -66,6 +66,7 @@ private: // ƒƒ“ƒo•Ï”
 	Object3d* eArmObj = nullptr;//ƒGƒlƒ~[‚Ì˜r
 	Object3d* pBulletObj[255] = { nullptr };//’e
 	Object3d* eBulletObj[255] = { nullptr };//’e
+	Object3d* eBulletObj2[255] = { nullptr };//’e
 	Object3d* wallObj[24] = { nullptr };//’e
 
 	ParticleManager* particleMan = nullptr;
@@ -116,6 +117,12 @@ private: // ƒƒ“ƒo•Ï”
 	float eBullSpeedX[255], eBullSpeedY[255];//“G‚Ì’e‚Ì‹““®—p
 	float eBullX[255], eBullY[255], eBullXY[255];//“G‚Ì’e‚Ì‹““®—p
 
+	XMFLOAT3 eBullPos2[255];//“G‚Ì’e‚ÌÀ•W
+	XMFLOAT3 eBullScale2[255];//“G‚Ì’e‚Ì‘å‚«‚³
+	bool eBull2[255] = { false };//“G‚Ì’e‚ª‰æ–Êã‚Éo‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	float eBullSpeed2X[255], eBullSpeed2Y[255];//“G‚Ì’e‚Ì‹““®—p
+	float eBull2X[255], eBull2Y[255], eBull2XY[255];//“G‚Ì’e‚Ì‹““®—p
+
 	XMFLOAT3 eArmPos[5];//˜r‚ÌÀ•W
 	XMFLOAT3 eArmRot[5];//˜r‚ÌŒX‚«
 	XMFLOAT3 eArmScale[5];//˜r‚Ì‘å‚«‚³
@@ -164,4 +171,6 @@ private: // ƒƒ“ƒo•Ï”
 	bool eArm[5] = { false };//˜r‚Ì•\¦
 	int eArmCount = 0;//˜r‚Ì“®ì—p
 	int iceCount = 0;
+	float PI = 3.1415926;
+	int bulletCount = 0;
 };
