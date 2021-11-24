@@ -30,7 +30,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 	//nullptrチェック
 	assert(dxCommon);
 	assert(input);
-	assert(audio);
+	assert(sound);
 
 	this->dxCommon = dxCommon;
 	this->input = input;
