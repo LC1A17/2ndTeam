@@ -61,6 +61,18 @@ private: // メンバ変数
 	Sprite* playerHpFlame = nullptr;
 	Sprite* gameover = nullptr;
 	Sprite* gameBack2 = nullptr;
+	Sprite* clear = nullptr;
+	Sprite* takendamage = nullptr;
+	Sprite* num0[6] = { nullptr };
+	Sprite* num1[6] = { nullptr };
+	Sprite* num2[6] = { nullptr };
+	Sprite* num3[6] = { nullptr };
+	Sprite* num4[6] = { nullptr };
+	Sprite* num5[6] = { nullptr };
+	Sprite* num6[6] = { nullptr };
+	Sprite* num7[6] = { nullptr };
+	Sprite* num8[6] = { nullptr };
+	Sprite* num9[6] = { nullptr };
 	Model* modelFighter = nullptr;
 
 	Object3d* baseObj = nullptr;//フィールド
@@ -176,4 +188,11 @@ private: // メンバ変数
 	int iceCount = 0;
 	float PI = 3.1415926;
 	int bulletCount = 0;
+
+	int clearTime = 0;
+
+	float bulletAngle[16] = {};
+
+	bool isSound[4] = { false };
+	int SoundCount[4] = { 0 };
 };

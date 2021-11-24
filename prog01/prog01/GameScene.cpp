@@ -98,6 +98,66 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 		assert(0);
 	}
 
+	if (!Sprite::LoadTexture(11, L"Resources/clear.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(12, L"Resources/takendamage.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(13, L"Resources/0.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(14, L"Resources/1.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(15, L"Resources/2.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(16, L"Resources/3.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(17, L"Resources/4.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(18, L"Resources/5.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(19, L"Resources/6.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(20, L"Resources/7.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(21, L"Resources/8.png"))
+	{
+		assert(0);
+	}
+
+	if (!Sprite::LoadTexture(22, L"Resources/9.png"))
+	{
+		assert(0);
+	}
+
 	//背景スプライト生成
 	gamestart = Sprite::Create(1, { 0.0f,0.0f });
 	gamestart->SetSize({ 830, 46 });
@@ -138,6 +198,57 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 	gameBack2 = Sprite::Create(10, { 0.0f,0.0f });
 	gameBack2->SetSize({ WinApp::window_width, WinApp::window_height });
 	gameBack2->SetPosition({ 0.0f,0.0f });
+
+	clear = Sprite::Create(11, { 0.0f,0.0f });
+	clear->SetSize({ 300.5, 45.5 });
+	clear->SetPosition({ 0.0f, 300.0f });
+
+	takendamage = Sprite::Create(12, { 0.0f,0.0f });
+	takendamage->SetSize({ 413, 56 });
+	takendamage->SetPosition({ 0.0f, 400.0f });
+
+	for (int i = 0; i < 6; i++)
+	{
+		num0[i] = Sprite::Create(13, { 0.0f,0.0f });
+		num0[i]->SetSize({ 17, 22 });
+		num0[i]->SetPosition({ 0.0f,0.0f });
+
+		num1[i] = Sprite::Create(14, { 0.0f,0.0f });
+		num1[i]->SetSize({ 17, 22 });
+		num1[i]->SetPosition({ 0.0f,0.0f });
+
+		num2[i] = Sprite::Create(15, { 0.0f,0.0f });
+		num2[i]->SetSize({ 17, 22 });
+		num2[i]->SetPosition({ 0.0f,0.0f });
+
+		num3[i] = Sprite::Create(16, { 0.0f,0.0f });
+		num3[i]->SetSize({ 17, 22 });
+		num3[i]->SetPosition({ 0.0f,0.0f });
+
+		num4[i] = Sprite::Create(17, { 0.0f,0.0f });
+		num4[i]->SetSize({ 17, 22 });
+		num4[i]->SetPosition({ 0.0f,0.0f });
+
+		num5[i] = Sprite::Create(18, { 0.0f,0.0f });
+		num5[i]->SetSize({ 17, 22 });
+		num5[i]->SetPosition({ 0.0f,0.0f });
+
+		num6[i] = Sprite::Create(19, { 0.0f,0.0f });
+		num6[i]->SetSize({ 17, 22 });
+		num6[i]->SetPosition({ 0.0f,0.0f });
+
+		num7[i] = Sprite::Create(20, { 0.0f,0.0f });
+		num7[i]->SetSize({ 17, 22 });
+		num7[i]->SetPosition({ 0.0f,0.0f });
+
+		num8[i] = Sprite::Create(21, { 0.0f,0.0f });
+		num8[i]->SetSize({ 17, 22 });
+		num8[i]->SetPosition({ 0.0f,0.0f });
+
+		num9[i] = Sprite::Create(22, { 0.0f,0.0f });
+		num9[i]->SetSize({ 17, 22 });
+		num9[i]->SetPosition({ 0.0f,0.0f });
+	}
 
 	//3Dオブジェクト生成
 
@@ -181,7 +292,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 	for (int i = 0; i < 255; i++)
 	{
 		eBullPos[i] = { 1000, 1000, 1000 };
-		eBullScale[i] = { 20, 20, 20 };
+		eBullScale[i] = { 10, 10, 10 };
 		eBulletObj[i] = Object3d::Create();
 		eBulletObj[i]->SetModel(modelFighter);
 		eBulletObj[i]->SetPosition({ eBullPos[i] });
@@ -191,7 +302,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 	for (int i = 0; i < 255; i++)
 	{
 		eBullPos2[i] = { 1000, 1000, 1000 };
-		eBullScale2[i] = { 20, 20, 20 };
+		eBullScale2[i] = { 10, 10, 10 };
 		eBulletObj2[i] = Object3d::Create();
 		eBulletObj2[i]->SetModel(modelFighter);
 		eBulletObj2[i]->SetPosition({ eBullPos2[i] });
@@ -278,7 +389,15 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 	playerParticleMan = ParticleManager::Create();//パーティクル生成
 	enemyParticleMan = ParticleManager::Create();//パーティクル生成
 
-	//Sound::SoundData soundData1 = sound->SoundLoadWave("Resources/audio/title.wav");
+	for (int i = 0; i < _countof(bulletAngle); i++)
+	{
+		bulletAngle[i] = 62 * i * (PI * PI);
+	}
+
+	Sound::SoundData soundData1 = sound->SoundLoadWave("Resources/audio/title.wav");
+	Sound::SoundData soundData2 = sound->SoundLoadWave("Resources/audio/game.wav");
+	Sound::SoundData soundData3 = sound->SoundLoadWave("Resources/audio/clear.wav");
+	Sound::SoundData soundData4 = sound->SoundLoadWave("Resources/audio/gameOver.wav");
 	//sound->SoundPlayWave(soundData1);//サウンド再生
 
 	//カメラ
@@ -660,6 +779,8 @@ void GameScene::Update()
 			//範囲外に出た弾をfalseにする
 			if (eBullPos2[i].x <= -1000 || eBullPos2[i].x >= 1000 || eBullPos2[i].z <= -1000 || eBullPos2[i].z >= 1000)
 			{
+				eBullSpeed2Y[i] = 0;
+				eBullSpeed2X[i] = 0;
 				eBullPos2[i] = { 1000, 1000, 1000 };
 				eBulletObj2[i]->SetPosition({ eBullPos2[i] });
 				eBull2[i] = false;
@@ -708,9 +829,19 @@ void GameScene::Update()
 
 		//↑この辺よくわからないからコメントアウト書いて↑
 
+		//開始時カメラ
+		if (cameraMoveCount[13])
+		{
+			StartCameraMove();
+		}
+
+		camera->Update();
+
 		//開始時カメラが終わるまで更新しない
 		if (!cameraMoveCount[13])
 		{
+			clearTime++;
+
 			if (isAttack)
 			{
 				eAttackInterval++;//ボスの攻撃間隔
@@ -786,14 +917,14 @@ void GameScene::Update()
 							{
 								for (int i = 0; i < 255; i++)
 								{
-									if (!eBull2[i] && eBullSpeed2X[i] == 0 && eBullSpeed2Y[i] == 0)
+									if (!eBull2[i])
 									{
 										bulletCount++;
 										eBull2[i] = true;
 										eBullPos2[i] = ePos;
 										eBulletObj2[i]->SetPosition({ eBullPos2[i] });
-										eBullSpeed2Y[i] = tan(bulletCount / 16 * (PI * PI)) * 0.6;
-										eBullSpeed2X[i] = cos(bulletCount / 16 * (PI * PI)) * 0.6;
+										eBullSpeed2Y[i] = tan(62.5 * bulletCount * (PI * PI)) * 2;
+										eBullSpeed2X[i] = cos(62.5 * bulletCount * (PI * PI)) * 2;
 										break;
 									}
 								}
@@ -1201,13 +1332,6 @@ void GameScene::Update()
 		wallObj[i]->Update();
 	}
 
-	if (cameraMoveCount[13])
-	{
-		StartCameraMove();
-	}
-
-	camera->Update();
-
 	//パーティクル
 	if (circle == 3)
 	{
@@ -1306,13 +1430,15 @@ void GameScene::Draw()
 	//3:リザルト画面
 	else if (sceneNum == Clear)
 	{
+		gameBack2->Draw();//背景
 		endBack->Draw();//背景
 	}
 
 	//4:ゲームオーバー画面
 	else
 	{
-		endBack->Draw();//背景
+		gameBack2->Draw();//背景
+		gameover->Draw();//背景
 	}
 
 	Sprite::PostDraw();//スプライト描画後処理
@@ -1455,6 +1581,23 @@ void GameScene::Draw()
 	//3:リザルト画面
 	else if (sceneNum == Clear)
 	{
+		clear->Draw();//背景スプライト描画
+		takendamage->Draw();//背景スプライト描画
+
+		for (int i = 0; i < 6; i++)
+		{
+			num0[i]->Draw();
+			num1[i]->Draw();
+			num2[i]->Draw();
+			num3[i]->Draw();
+			num4[i]->Draw();
+			num5[i]->Draw();
+			num6[i]->Draw();
+			num7[i]->Draw();
+			num8[i]->Draw();
+			num9[i]->Draw();
+		}
+
 		//ゲームスタート（点滅あり）
 		if (logoCount <= 20 && endCount >= 120)
 		{
