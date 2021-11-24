@@ -894,23 +894,6 @@ void GameScene::Update()
 		}
 
 		//↓この辺よくわからないからコメントアウト書いて↓
-		rad = angle * 3.14f / 180.0f;
-		aroundX = cos(rad) * len / i;
-		aroundZ = sin(rad) * len / i;
-		pPos.x = posX + aroundX;
-		pPos.z = posZ + aroundZ;
-
-		if (!cameraMoveCount[13] && !shakeFlag)
-		{
-			playerObj->SetPosition({ pPos });
-
-			fixedCamera.x = cos(rad) * len * 2.4f;
-			fixedCamera.y = fixed.y;
-			fixedCamera.z = sin(rad) * len * 2.4f;
-
-			camera->SetEye(fixedCamera);
-		}
-
 		rad = angle * 3.14159265359f / 180.0f;
 
 		aroundX = cos(rad) * len / i;
@@ -952,7 +935,11 @@ void GameScene::Update()
 			attenuation += 1;
 		}
 
+<<<<<<< HEAD
 		else if (attenuation >= 10)
+=======
+		else if (attenuation >= 60)
+>>>>>>> e504338ccb51478c2834098103de703497265c9d
 		{
 			shakeTimer = 0;
 			attenuation = 0;
@@ -2071,6 +2058,10 @@ void GameScene::Update()
 	{
 		wallObj[i]->Update();
 	}
+<<<<<<< HEAD
+=======
+	
+>>>>>>> e504338ccb51478c2834098103de703497265c9d
 
 	//パーティクル
 	if (circle == 3)
