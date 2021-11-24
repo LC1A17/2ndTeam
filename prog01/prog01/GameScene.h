@@ -78,6 +78,7 @@ private: // メンバ変数
 	Object3d* baseObj = nullptr;//フィールド
 	Object3d* playerObj = nullptr;//プレイヤー
 	Object3d* enemyObj = nullptr;//エネミー
+	Object3d* eAtkObj = nullptr;//エネミー
 	Object3d* eArmObj = nullptr;//エネミーの腕
 	Object3d* pBulletObj[255] = { nullptr };//弾
 	Object3d* eBulletObj[255] = { nullptr };//弾
@@ -100,9 +101,10 @@ private: // メンバ変数
 	XMFLOAT3 wallRota[24];//壁の向き
 	XMFLOAT3 wallScale[24];//壁のスケール
 	bool isWall[24] = { false };//壁が出ているか
+	int wallHP[24] = { 10 };
 
-	float playerHP = 100;//プレイヤーの体力
-	float maxPlayerHP = 100;//プレイヤーの最大体力
+	float playerHP = 10;//プレイヤーの体力
+	float maxPlayerHP = 10;//プレイヤーの最大体力
 	XMFLOAT3 pPos = { 0, 0, 120 };//プレイヤーの座標
 	XMFLOAT3 pRot = { 0, 0, 0 };//プレイヤーの傾き
 	XMFLOAT3 pScale = { 5, 5, 5 };//プレイヤーの大きさ
@@ -118,8 +120,8 @@ private: // メンバ変数
 	float accel = 1.5f;//加速の倍率
 	int pDamageInterval = 50;//敵の被弾時の無敵時間
 
-	float enemyHP = 10;//敵の体力
-	float maxEnemyHP = 10;//敵の最大体力
+	float enemyHP = 100;//敵の体力
+	float maxEnemyHP = 100;//敵の最大体力
 	int eDamageInterval = 50;//敵の被弾時の無敵時間
 	XMFLOAT3 ePos = { 0, 0, 0 };//敵の座標
 	XMFLOAT3 eRot = { 0, 180, 0 };
@@ -156,6 +158,10 @@ private: // メンバ変数
 	float angleX = 0.0f;
 	float angleZ = 0.0f;
 	float eAngle = 0.0f;
+
+	bool shakeFlag = false;
+	int shakeTimer = 0;
+	int attenuation = 0;
 
 	XMVECTOR hoge;
 
@@ -195,4 +201,6 @@ private: // メンバ変数
 
 	bool isSound[4] = { false };
 	int SoundCount[4] = { 0 };
+
+	bool isEnemyAtk = true;
 };

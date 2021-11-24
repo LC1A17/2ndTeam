@@ -273,6 +273,14 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input, Sound* sound)
 	enemyObj->SetRotation({ eRot });
 	enemyObj->SetScale({ eScale });
 
+	//敵
+	modelFighter = modelFighter->CreateFromObject("enemyArmAttack");
+	eAtkObj = Object3d::Create();
+	eAtkObj->SetModel(modelFighter);
+	eAtkObj->SetPosition({ ePos });
+	eAtkObj->SetRotation({ eRot });
+	eAtkObj->SetScale({ eScale });
+
 	//弾
 	modelFighter = modelFighter->CreateFromObject("pBullet");
 
@@ -446,6 +454,7 @@ void GameScene::Update()
 			while (wallCount <= 4)
 			{
 				int w = rand() % 24;
+				wallHP[w] = 10;
 				isWall[w] = true;
 
 				wallCount = 0;
@@ -656,6 +665,7 @@ void GameScene::Update()
 				{
 					if (wallPos[j].x - 16 < pBullPos[i].x + 5 && pBullPos[i].x - 5 < wallPos[j].x + 16 && wallPos[j].z - 10.5 < pBullPos[i].z + 5 && pBullPos[i].z - 5 < wallPos[j].z + 10.5)
 					{
+						wallHP[j]--;
 						pBullPos[i] = { 1000, 1000, 1000 };
 						pBulletObj[i]->SetPosition({ pBullPos[i] });
 						pBull[i] = false;
@@ -708,6 +718,7 @@ void GameScene::Update()
 					{
 						playerHP -= 5;
 						isWall[i] = false;
+						shakeFlag = true;
 					}
 				}
 			}
@@ -743,9 +754,18 @@ void GameScene::Update()
 				{
 					if (wallPos[j].x - 16 < eBullPos[i].x + 5 && eBullPos[i].x - 5 < wallPos[j].x + 16 && wallPos[j].z - 10.5 < eBullPos[i].z + 5 && eBullPos[i].z - 5 < wallPos[j].z + 10.5)
 					{
+						wallHP[j]--;
 						eBullPos[i] = { 1000, 1000, 1000 };
 						eBulletObj[i]->SetPosition({ eBullPos[i] });
 						eBull[i] = false;
+					}
+
+					if (wallPos[j].x - 16 < eBullPos2[i].x + 5 && eBullPos2[i].x - 5 < wallPos[j].x + 16 && wallPos[j].z - 10.5 < eBullPos2[i].z + 5 && eBullPos2[i].z - 5 < wallPos[j].z + 10.5)
+					{
+						wallHP[j]--;
+						eBullPos2[i] = { 1000, 1000, 1000 };
+						eBulletObj2[i]->SetPosition({ eBullPos2[i] });
+						eBull2[i] = false;
 					}
 				}
 			}
@@ -763,6 +783,24 @@ void GameScene::Update()
 					eBullPos[i] = { 1000, 1000, 1000 };
 					eBulletObj[i]->SetPosition({ eBullPos[i] });
 					eBull[i] = false;
+					hit = true;
+					pDamageInterval = 0;
+				}
+			}
+
+			//プレイヤーとの判定
+			if (pDamageInterval >= 100 && !isDive)
+			{
+				float a = eBullPos2[i].x - pPos.x;
+				float b = eBullPos2[i].z - pPos.z;
+				float c = sqrt(a * a + b * b);
+
+				if (c <= 10)
+				{
+					playerHP--;
+					eBullPos2[i] = { 1000, 1000, 1000 };
+					eBulletObj2[i]->SetPosition({ eBullPos2[i] });
+					eBull2[i] = false;
 					hit = true;
 					pDamageInterval = 0;
 				}
@@ -787,6 +825,14 @@ void GameScene::Update()
 			}
 		}
 
+		for (int i = 0; i < 24; i++)
+		{
+			if (wallHP[i] <= 0)
+			{
+				isWall[i] = false;
+			}
+		}
+
 		//↓この辺よくわからないからコメントアウト書いて↓
 		rad = angle * 3.14f / 180.0f;
 		aroundX = cos(rad) * len / i;
@@ -794,7 +840,7 @@ void GameScene::Update()
 		pPos.x = posX + aroundX;
 		pPos.z = posZ + aroundZ;
 
-		if (!cameraMoveCount[13])
+		if (!cameraMoveCount[13] && !shakeFlag)
 		{
 			playerObj->SetPosition({ pPos });
 
@@ -818,7 +864,7 @@ void GameScene::Update()
 		fixedCamera.y = fixed.y;
 		fixedCamera.z = sin(rad) * len * 2;
 
-		if (!cameraMoveCount[13])
+		if (!cameraMoveCount[13] && !shakeFlag)
 		{
 			playerObj->SetBillboard(true);
 			playerObj->SetRotation({ 0,180,0 });
@@ -833,9 +879,8 @@ void GameScene::Update()
 		if (cameraMoveCount[13])
 		{
 			StartCameraMove();
+			camera->Update();
 		}
-
-		camera->Update();
 
 		//開始時カメラが終わるまで更新しない
 		if (!cameraMoveCount[13])
@@ -879,6 +924,7 @@ void GameScene::Update()
 							eAngle = atan2(angleX, angleZ);
 
 							enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+							eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
 
 							//画面上に存在しない弾を一つ選んでボスの位置にセット
 							for (int i = 0; i < 255; i++)
@@ -912,19 +958,25 @@ void GameScene::Update()
 
 							isLaser = true;
 							bulletCount = 0;
+							angleX = pPos.x - ePos.x;
+							angleZ = pPos.z - ePos.z;
 
-							while (bulletCount < 16)
+							eAngle = atan2(angleX, angleZ);
+
+							enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+							eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+
+							for (int i = 0; i < 16; i++)
 							{
-								for (int i = 0; i < 255; i++)
+								for (int j = 0; j < 255; j++)
 								{
-									if (!eBull2[i])
+									if (!eBull2[j])
 									{
-										bulletCount++;
-										eBull2[i] = true;
-										eBullPos2[i] = ePos;
-										eBulletObj2[i]->SetPosition({ eBullPos2[i] });
-										eBullSpeed2Y[i] = tan(62.5 * bulletCount * (PI * PI)) * 2;
-										eBullSpeed2X[i] = cos(62.5 * bulletCount * (PI * PI)) * 2;
+										eBull2[j] = true;
+										eBullPos2[j] = ePos;
+										eBulletObj2[j]->SetPosition({ eBullPos2[j] });
+										eBullSpeed2Y[j] = sin(62.5 * i * (PI * PI)) * 2;
+										eBullSpeed2X[j] = cos(62.5 * i * (PI * PI)) * 2;
 										break;
 									}
 								}
@@ -961,6 +1013,13 @@ void GameScene::Update()
 								enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
 
 								isLaser = true;
+								angleX = pPos.x - ePos.x;
+								angleZ = pPos.z - ePos.z;
+
+								eAngle = atan2(angleX, angleZ);
+
+								enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+								eAtkObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
 
 								//画面上に存在しない弾を一つ選んでボスの位置にセット
 								for (int i = 0; i < 255; i++)
@@ -1059,6 +1118,7 @@ void GameScene::Update()
 
 				if (wallCount < 10)
 				{
+					wallHP[w] = 10;
 					wallPos[w].y = -32;
 					isWall[w] = true;
 					wallObj[w]->SetPosition({ wallPos[w] });
@@ -1317,7 +1377,17 @@ void GameScene::Update()
 
 	baseObj->Update();
 	playerObj->Update();
-	enemyObj->Update();
+
+	if (isEnemyAtk)
+	{
+		eAtkObj->Update();
+	}
+
+	else
+	{
+		enemyObj->Update();
+	}
+
 	eArmObj->Update();
 
 	for (int i = 0; i < 255; i++)
@@ -1331,6 +1401,37 @@ void GameScene::Update()
 	{
 		wallObj[i]->Update();
 	}
+
+	
+	XMFLOAT3 i = fixedCamera;
+
+	//シェイク
+	if (shakeFlag)
+	{
+		shakeTimer++;
+	}
+
+	if (shakeTimer > 0)
+	{
+		i.x = ((rand() + 80) % (91 - attenuation) - 5);
+		i.y = ((rand() + 80) % (91 - attenuation) - 5);
+	}
+
+	if (shakeTimer >= attenuation * 60)
+	{
+		attenuation += 1;
+	}
+
+	else if (attenuation >= 100)
+	{
+		shakeTimer = 0;
+		attenuation = 0;
+		shakeFlag = false;
+	}
+
+	camera->SetEye(i);
+	camera->Update();
+	
 
 	//パーティクル
 	if (circle == 3)
@@ -1461,7 +1562,16 @@ void GameScene::Draw()
 	{
 		baseObj->Draw();
 		playerObj->Draw();
-		enemyObj->Draw();
+
+		if (isEnemyAtk)
+		{
+			eAtkObj->Draw();
+		}
+
+		else
+		{
+			enemyObj->Draw();
+		}
 
 		for (int i = 0; i < 5; i++)
 		{
