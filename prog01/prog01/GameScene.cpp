@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <ctime>
+#include <math.h>
 
 using namespace std;
 using namespace DirectX;
@@ -388,6 +389,7 @@ void GameScene::Update()
 						//ボスの位置を捕捉
 						if (!pBull[i])
 						{
+							pBullDamage[i] = circle;
 							pOldPos[i] = pPos;
 							pBullPos[i] = pPos;
 							pBullPos[i].y += 20;
@@ -506,7 +508,7 @@ void GameScene::Update()
 
 			if (c <= 10)
 			{
-				enemyHP--;
+				enemyHP -= pBullDamage[i];
 				pBullPos[i] = { 1000, 1000, 1000 };
 				pBulletObj[i]->SetPosition({ pBullPos[i] });
 				pBull[i] = false;
@@ -645,6 +647,7 @@ void GameScene::Update()
 			camera->SetEye(fixedCamera);
 			camera->Update();
 		}
+
 		//↑この辺よくわからないからコメントアウト書いて↑
 
 		//開始時カメラが終わるまで更新しない
@@ -652,7 +655,6 @@ void GameScene::Update()
 		{
 			if (isAttack)
 			{
-				enemyObj->SetBillboard(false);
 				eAttackInterval++;//ボスの攻撃間隔
 			}
 
@@ -682,8 +684,12 @@ void GameScene::Update()
 							}
 
 							isLaser = true;
-							enemyObj->SetBillboard(true);
-							enemyObj->SetRotation({ 0, 0, 0 });
+							angleX = pPos.x - ePos.x;
+							angleZ = pPos.z - ePos.z;
+
+							eAngle = atan2(angleX, angleZ);
+
+							enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
 
 							//画面上に存在しない弾を一つ選んでボスの位置にセット
 							for (int i = 0; i < 255; i++)
@@ -740,8 +746,13 @@ void GameScene::Update()
 							//使えないなら自機狙い弾
 							else
 							{
-								enemyObj->SetBillboard(true);
-								enemyObj->SetRotation({ 0, 0, 0 });
+								angleX = pPos.x - ePos.x;
+								angleZ = pPos.z - ePos.z;
+
+								eAngle = atan2(angleX, angleZ);
+
+								enemyObj->SetRotation({ 0, XMConvertToDegrees(eAngle) - 180, 0 });
+
 								isLaser = true;
 
 								//画面上に存在しない弾を一つ選んでボスの位置にセット

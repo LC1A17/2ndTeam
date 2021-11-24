@@ -97,6 +97,7 @@ private: // メンバ変数
 	bool pBull[255] = { false };//プレイヤーの弾が画面上に出ているかどうか
 	float pBullSpeedX[255], pBullSpeedY[255];//プレイヤーの弾の挙動用
 	float pBullX[255], pBullY[255], pBullXY[255];//プレイヤーの弾の挙動用
+	float pBullDamage[255] = { 0 };
 	float speed = 2.0f;
 	float accel = 1.5f;//加速の倍率
 	int pDamageInterval = 50;//敵の被弾時の無敵時間
@@ -130,6 +131,9 @@ private: // メンバ変数
 	float len = 60.0f;
 	float aroundX = 0.0f;
 	float aroundZ = 0.0f;
+	float angleX = 0.0f;
+	float angleZ = 0.0f;
+	float eAngle = 0.0f;
 
 	XMVECTOR hoge;
 
