@@ -834,23 +834,6 @@ void GameScene::Update()
 		}
 
 		//↓この辺よくわからないからコメントアウト書いて↓
-		rad = angle * 3.14f / 180.0f;
-		aroundX = cos(rad) * len / i;
-		aroundZ = sin(rad) * len / i;
-		pPos.x = posX + aroundX;
-		pPos.z = posZ + aroundZ;
-
-		if (!cameraMoveCount[13] && !shakeFlag)
-		{
-			playerObj->SetPosition({ pPos });
-
-			fixedCamera.x = cos(rad) * len * 2.4f;
-			fixedCamera.y = fixed.y;
-			fixedCamera.z = sin(rad) * len * 2.4f;
-
-			camera->SetEye(fixedCamera);
-		}
-
 		rad = angle * 3.14159265359f / 180.0f;
 
 		aroundX = cos(rad) * len / i;
@@ -872,6 +855,36 @@ void GameScene::Update()
 			camera->SetEye(fixedCamera);
 			camera->Update();
 		}
+
+		XMFLOAT3 i = fixedCamera;
+
+		//シェイク
+		if (shakeFlag)
+		{
+			shakeTimer++;
+		}
+
+		if (shakeTimer > 0)
+		{
+			i.x = ((rand() + 80) % (91 - attenuation) - 5) + fixedCamera.x;
+			i.y = ((rand() + 80) % (91 - attenuation) - 5) + fixedCamera.y;
+			i.z = fixedCamera.z;
+		}
+
+		if (shakeTimer >= attenuation * 2)
+		{
+			attenuation += 1;
+		}
+
+		else if (attenuation >= 60)
+		{
+			shakeTimer = 0;
+			attenuation = 0;
+			shakeFlag = false;
+		}
+
+		camera->SetEye(i);
+		camera->Update();
 
 		//↑この辺よくわからないからコメントアウト書いて↑
 
@@ -1401,36 +1414,6 @@ void GameScene::Update()
 	{
 		wallObj[i]->Update();
 	}
-
-	
-	XMFLOAT3 i = fixedCamera;
-
-	//シェイク
-	if (shakeFlag)
-	{
-		shakeTimer++;
-	}
-
-	if (shakeTimer > 0)
-	{
-		i.x = ((rand() + 80) % (91 - attenuation) - 5);
-		i.y = ((rand() + 80) % (91 - attenuation) - 5);
-	}
-
-	if (shakeTimer >= attenuation * 60)
-	{
-		attenuation += 1;
-	}
-
-	else if (attenuation >= 100)
-	{
-		shakeTimer = 0;
-		attenuation = 0;
-		shakeFlag = false;
-	}
-
-	camera->SetEye(i);
-	camera->Update();
 	
 
 	//パーティクル
