@@ -14,111 +14,117 @@
 
 class GameScene
 {
-private: // ã‚¨ã‚¤ãƒªã‚¢ã‚¹
-	// Microsoft::WRL::ã‚’çœç•¥
+private: // ƒGƒCƒŠƒAƒX
+	// Microsoft::WRL::‚ğÈ—ª
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-	// DirectX::ã‚’çœç•¥
+	// DirectX::‚ğÈ—ª
 	using XMFLOAT2 = DirectX::XMFLOAT2;
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
 	using XMVECTOR = DirectX::XMVECTOR;
 
-private: // é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°
+private: // Ã“Iƒƒ“ƒo•Ï”
 	static const int debugTextTexNumber = 0;
 
 public:
-	//SceneNumç”¨
+	//SceneNum—p
 	enum Scene
 	{
-		Title, Game, End
+		Title, Game, Clear, GameOver
 	};
 
-public://ãƒ¡ãƒ³ãƒé–¢æ•°
-	GameScene();//ã‚³ãƒ³ã‚¹ãƒˆã‚¯ãƒ©ã‚¿
-	~GameScene();//ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
-	void Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio);//åˆæœŸåŒ–
-	void Update();//æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‡¦ç†
-	void Draw();//æç”»
-	void StartCameraMove(); //æœ€åˆã®ã‚«ãƒ¡ãƒ©ã®å‹•ã
+public://ƒƒ“ƒoŠÖ”
+	GameScene();//ƒRƒ“ƒXƒgƒNƒ‰ƒ^
+	~GameScene();//ƒfƒXƒgƒ‰ƒNƒ^
+	void Initialize(DirectXCommon* dxCommon, Input* input, Audio* audio);//‰Šú‰»
+	void Update();//–ˆƒtƒŒ[ƒ€ˆ—
+	void Draw();//•`‰æ
+	void StartCameraMove(); //Å‰‚ÌƒJƒƒ‰‚Ì“®‚«
 
-private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
+private: // ƒƒ“ƒo•Ï”
 	DirectXCommon* dxCommon = nullptr;
 	Input* input = nullptr;
 	Audio* audio = nullptr;
 	DebugText debugText;
 
-	// ã‚²ãƒ¼ãƒ ã‚·ãƒ¼ãƒ³ç”¨
+	// ƒQ[ƒ€ƒV[ƒ“—p
 	Sprite* sprite = nullptr;
-	Sprite* titleBack = nullptr;//ã‚¿ã‚¤ãƒˆãƒ«
-	Sprite* gameBack = nullptr;//ã‚²ãƒ¼ãƒ 
-	Sprite* endBack = nullptr;//ã‚¨ãƒ³ãƒ‰
+	Sprite* gamestart = nullptr;
+	Sprite* titleBack = nullptr;//ƒ^ƒCƒgƒ‹
+	Sprite* gameBack = nullptr;//ƒQ[ƒ€
+	Sprite* endBack = nullptr;//ƒGƒ“ƒh
+	Sprite* enemyHp = nullptr;
+	Sprite* enemyHpFlame = nullptr;
+	Sprite* playerHp = nullptr;
+	Sprite* playerHpFlame = nullptr;
 	Model* modelFighter = nullptr;
 
-	Object3d* baseObj = nullptr;//ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰
-	Object3d* playerObj = nullptr;//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
-	Object3d* enemyObj = nullptr;//ã‚¨ãƒãƒŸãƒ¼
-	Object3d* eArmObj = nullptr;//ã‚¨ãƒãƒŸãƒ¼ã®è…•
-	Object3d* pBulletObj[255] = { nullptr };//å¼¾
-	Object3d* eBulletObj[255] = { nullptr };//å¼¾
-	Object3d* wallObj[30] = { nullptr };//å¼¾
+	Object3d* baseObj = nullptr;//ƒtƒB[ƒ‹ƒh
+	Object3d* playerObj = nullptr;//ƒvƒŒƒCƒ„[
+	Object3d* enemyObj = nullptr;//ƒGƒlƒ~[
+	Object3d* eArmObj = nullptr;//ƒGƒlƒ~[‚Ì˜r
+	Object3d* pBulletObj[255] = { nullptr };//’e
+	Object3d* eBulletObj[255] = { nullptr };//’e
+	Object3d* wallObj[24] = { nullptr };//’e
 
+	ParticleManager* particleMan = nullptr;
 	ParticleManager* playerParticleMan = nullptr;
 	ParticleManager* enemyParticleMan = nullptr;
 
 	Model* modelFighter1 = nullptr;
 
-	int sceneNum = Game;//Title, Game, Endã§ç®¡ç†
-	int circle = 2;//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã„ã‚‹å††å‘¨ã®ä½ç½®ã€‚1ãŒæœ€ä½å€¤ã§æ•°ãŒå¤§ãã„æ–¹ãŒå¤–å´
-	int maxCircle = 3;//ç¾åœ¨ã®å††å‘¨ã®æœ€å¤§æ•°
+	int sceneNum = Title;//Title, Game, Clear, GameOver‚ÅŠÇ—
+	int circle = 2;//ƒvƒŒƒCƒ„[‚Ì‚¢‚é‰~ü‚ÌˆÊ’uB1‚ªÅ’á’l‚Å”‚ª‘å‚«‚¢•û‚ªŠO‘¤
+	int maxCircle = 3;//Œ»İ‚Ì‰~ü‚ÌÅ‘å”
 
-	XMFLOAT3 basePos = { 0,0,5 };//åœŸå°ã®åº§æ¨™
-	XMFLOAT3 baseScale = { 200, 200, 200 };//åœŸå°ã®ã‚¹ã‚±ãƒ¼ãƒ«
-	XMFLOAT3 wallPos[30];//å£ã®åº§æ¨™
-	XMFLOAT3 wallRota[30];//å£ã®å‘ã
-	XMFLOAT3 wallScale[30];//å£ã®ã‚¹ã‚±ãƒ¼ãƒ«
-	bool isWall[30] = { false };//å£ãŒå‡ºã¦ã„ã‚‹ã‹
+	XMFLOAT3 basePos = { 0,0,5 };//“y‘ä‚ÌÀ•W
+	XMFLOAT3 baseScale = { 230, 230, 230 };//“y‘ä‚ÌƒXƒP[ƒ‹
+	XMFLOAT3 wallPos[24];//•Ç‚ÌÀ•W
+	XMFLOAT3 wallRota[24];//•Ç‚ÌŒü‚«
+	XMFLOAT3 wallScale[24];//•Ç‚ÌƒXƒP[ƒ‹
+	bool isWall[24] = { false };//•Ç‚ªo‚Ä‚¢‚é‚©
 
-	int playerHP = 100;//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ä½“åŠ›
-	XMFLOAT3 pPos = { 0, 0, 120 };//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åº§æ¨™
-	XMFLOAT3 pRot = { 0, 0, 0 };//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å‚¾ã
-	XMFLOAT3 pScale = { 5, 5, 5 };//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¤§ãã•
-	XMFLOAT3 pOldPos[255];//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®åº§æ¨™
-	XMFLOAT3 pBullPos[255];//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¼¾ã®åº§æ¨™
-	XMFLOAT3 pBullScale[255];//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¼¾ã®å¤§ãã•
+	float playerHP = 100;//ƒvƒŒƒCƒ„[‚Ì‘Ì—Í
+	float maxPlayerHP = 100;//ƒvƒŒƒCƒ„[‚ÌÅ‘å‘Ì—Í
+	XMFLOAT3 pPos = { 0, 0, 120 };//ƒvƒŒƒCƒ„[‚ÌÀ•W
+	XMFLOAT3 pRot = { 0, 0, 0 };//ƒvƒŒƒCƒ„[‚ÌŒX‚«
+	XMFLOAT3 pScale = { 5, 5, 5 };//ƒvƒŒƒCƒ„[‚Ì‘å‚«‚³
+	XMFLOAT3 pOldPos[255];//ƒvƒŒƒCƒ„[‚ÌÀ•W
+	XMFLOAT3 pBullPos[255];//ƒvƒŒƒCƒ„[‚Ì’e‚ÌÀ•W
+	XMFLOAT3 pBullScale[255];//ƒvƒŒƒCƒ„[‚Ì’e‚Ì‘å‚«‚³
 	int pBullInterval = 30;
-	bool pBull[255] = { false };//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¼¾ãŒç”»é¢ä¸Šã«å‡ºã¦ã„ã‚‹ã‹ã©ã†ã‹
-	float pBullSpeedX[255], pBullSpeedY[255];//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¼¾ã®æŒ™å‹•ç”¨
-	float pBullX[255], pBullY[255], pBullXY[255];//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®å¼¾ã®æŒ™å‹•ç”¨
+	bool pBull[255] = { false };//ƒvƒŒƒCƒ„[‚Ì’e‚ª‰æ–Êã‚Éo‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	float pBullSpeedX[255], pBullSpeedY[255];//ƒvƒŒƒCƒ„[‚Ì’e‚Ì‹““®—p
+	float pBullX[255], pBullY[255], pBullXY[255];//ƒvƒŒƒCƒ„[‚Ì’e‚Ì‹““®—p
 	float speed = 2.0f;
-	float accel = 1.5f;//åŠ é€Ÿã®å€ç‡
-	int pDamageInterval = 50;//æ•µã®è¢«å¼¾æ™‚ã®ç„¡æ•µæ™‚é–“
+	float accel = 1.5f;//‰Á‘¬‚Ì”{—¦
+	int pDamageInterval = 50;//“G‚Ì”í’e‚Ì–³“GŠÔ
 
-	int enemyHP = 10;//æ•µã®ä½“åŠ›
-	int eDamageInterval = 50;//æ•µã®è¢«å¼¾æ™‚ã®ç„¡æ•µæ™‚é–“
-	XMFLOAT3 ePos = { 0, 0, 0 };//æ•µã®åº§æ¨™
-	XMFLOAT3 eScale = { 10, 10, 10 };//æ•µã®å¤§ãã•
-	int eAttackInterval = 0;//æ•µã®è¡Œå‹•ã®é–“éš”
+	float enemyHP = 10;//“G‚Ì‘Ì—Í
+	float maxEnemyHP = 10;//“G‚ÌÅ‘å‘Ì—Í
+	int eDamageInterval = 50;//“G‚Ì”í’e‚Ì–³“GŠÔ
+	XMFLOAT3 ePos = { 0, 0, 0 };//“G‚ÌÀ•W
+	XMFLOAT3 eRot = { 0, 180, 0 };
+	XMFLOAT3 eScale = { 10, 10, 10 };//“G‚Ì‘å‚«‚³
+	int eAttackInterval = 0;//“G‚Ìs“®‚ÌŠÔŠu
 	int wallCount = 0;
-	XMFLOAT3 eBullPos[255];//æ•µã®å¼¾ã®åº§æ¨™
-	XMFLOAT3 eBullScale[255];//æ•µã®å¼¾ã®å¤§ãã•
-	bool eBull[255] = { false };//æ•µã®å¼¾ãŒç”»é¢ä¸Šã«å‡ºã¦ã„ã‚‹ã‹ã©ã†ã‹
-	float eBullSpeedX[255], eBullSpeedY[255];//æ•µã®å¼¾ã®æŒ™å‹•ç”¨
-	float eBullX[255], eBullY[255], eBullXY[255];//æ•µã®å¼¾ã®æŒ™å‹•ç”¨
+	XMFLOAT3 eBullPos[255];//“G‚Ì’e‚ÌÀ•W
+	XMFLOAT3 eBullScale[255];//“G‚Ì’e‚Ì‘å‚«‚³
+	bool eBull[255] = { false };//“G‚Ì’e‚ª‰æ–Êã‚Éo‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	float eBullSpeedX[255], eBullSpeedY[255];//“G‚Ì’e‚Ì‹““®—p
+	float eBullX[255], eBullY[255], eBullXY[255];//“G‚Ì’e‚Ì‹““®—p
 
-	XMFLOAT3 eArmPos = { 0, 0, 0 };//è…•ã®åº§æ¨™
-	XMFLOAT3 eArmRot = { 0, 0, 0 };//è…•ã®å‚¾ã
-	XMFLOAT3 eArmScale = { 60, 60, 60 };//è…•ã®å¤§ãã•
-	bool eArm = false;//è…•ã®è¡¨ç¤º
-	int eArmCount = 0;//è…•ã®å‹•ä½œç”¨
+	XMFLOAT3 eArmPos[5];//˜r‚ÌÀ•W
+	XMFLOAT3 eArmRot[5];//˜r‚ÌŒX‚«
+	XMFLOAT3 eArmScale[5];//˜r‚Ì‘å‚«‚³
 
-	bool isDive = false;//æ½œã‚‹
-	bool direction = false;//æ½œã‚‹ã¨ãã®é€²è¡Œæ–¹å‘
-	bool diveMove[3] = { false };//æ½œã£ãŸå¾Œã®ç§»å‹•
+	bool isDive = false;//ö‚é
+	bool direction = false;//ö‚é‚Æ‚«‚Ìis•ûŒü
+	bool diveMove[3] = { false };//ö‚Á‚½Œã‚ÌˆÚ“®
 
 	float posX = 0.0f;
 	float posZ = 0.0f;
-
 	float rad = 0.0f;
 	float angle = 90.0f;
 	float len = 60.0f;
@@ -135,6 +141,23 @@ private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
 	float cameraRad = 0.0f;
 	float cameraAngle = 90.0f;
 
-	float i =1.0f;
+	float i = 1.0f;
 	bool hit = false;
+
+	int logoCount = 0;//ƒ^ƒCƒgƒ‹“_–ÅƒJƒEƒ“ƒg
+	bool isLoad = false;//ƒ[ƒh
+	int loadCount = 0;//ƒ[ƒhŠÔ
+	int endCount = 0;//ƒQ[ƒ€ƒI[ƒo[Œã‚Ì“ü—Í‘Ò‚¿ŠÔ
+	int enemyMove[2] = { 0, 0 };//s“®”»’è—p
+	int moveCount = 0;//s“®‚µ‚½‰ñ”
+	bool isLaser = true;//ƒŒ[ƒU[g—p‰Â”\‚©
+	bool isBarrier = true;//ƒ_ƒ[ƒWƒŒ[ƒ“g—p‰Â”\‚©
+	bool isAttack = true;//UŒ‚‚ªI‚í‚Á‚½‚©
+	bool laserAttack = false;//ƒŒ[ƒU[”­“®’†‚©
+	int laserCount = 0;//ƒŒ[ƒU[‚ÌŠÔ
+	bool wallCreate = false;//•Ç¶¬’†‚©
+	bool isArm = false;//˜rUŒ‚’†‚©
+	bool eArm[5] = { false };//˜r‚Ì•\¦
+	int eArmCount = 0;//˜r‚Ì“®ì—p
+	int iceCount = 0;
 };

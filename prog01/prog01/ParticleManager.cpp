@@ -214,8 +214,8 @@ bool ParticleManager::InitializeGraphicsPipeline()
 		errstr.resize(errorBlob->GetBufferSize());
 
 		std::copy_n((char*)errorBlob->GetBufferPointer(),
-		errorBlob->GetBufferSize(),
-		errstr.begin());
+			errorBlob->GetBufferSize(),
+			errstr.begin());
 		errstr += "\n";
 		// エラー内容を出力ウィンドウに表示
 		OutputDebugStringA(errstr.c_str());
@@ -238,10 +238,10 @@ bool ParticleManager::InitializeGraphicsPipeline()
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
-	
+
 		std::copy_n((char*)errorBlob->GetBufferPointer(),
-		errorBlob->GetBufferSize(),
-		errstr.begin());
+			errorBlob->GetBufferSize(),
+			errstr.begin());
 		errstr += "\n";
 		// エラー内容を出力ウィンドウに表示
 		OutputDebugStringA(errstr.c_str());
@@ -266,8 +266,8 @@ bool ParticleManager::InitializeGraphicsPipeline()
 		errstr.resize(errorBlob->GetBufferSize());
 
 		std::copy_n((char*)errorBlob->GetBufferPointer(),
-		errorBlob->GetBufferSize(),
-		errstr.begin());
+			errorBlob->GetBufferSize(),
+			errstr.begin());
 		errstr += "\n";
 		// エラー内容を出力ウィンドウに表示
 		OutputDebugStringA(errstr.c_str());
